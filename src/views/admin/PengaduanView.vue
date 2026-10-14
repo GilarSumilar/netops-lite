@@ -40,6 +40,7 @@
           </button>
         </div>
       </div>
+    </div>
     <!-- Modal Tangani Tiket -->
     <div v-if="showTanganiModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showTanganiModal = false">
       <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 p-6">
