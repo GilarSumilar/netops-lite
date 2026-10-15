@@ -4,15 +4,22 @@
     open ? 'translate-x-0' : '-translate-x-full'
   ]">
     <div class="flex flex-col">
-      <!-- Logo -->
+      <!-- Logo + close button mobile -->
       <div class="h-16 px-space-md flex items-center gap-space-sm border-b border-border-subtle">
         <div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center shrink-0">
           <span class="material-symbols-outlined text-on-primary text-[20px]">router</span>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col flex-1 min-w-0">
           <span class="font-headline-sm text-headline-sm text-text-primary tracking-tight font-bold">NetOps Lite</span>
           <span class="font-label-sm text-label-sm text-text-muted">ISP &amp; RT-RW Management</span>
         </div>
+        <button
+          class="lg:hidden p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors shrink-0"
+          @click="sidebarOpen = false"
+          aria-label="Tutup menu"
+        >
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
       </div>
 
       <!-- Nav label -->
@@ -80,7 +87,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -106,11 +113,11 @@ function navigateAndClose(navigate) {
 }
 
 const navItems = [
-  { to: '/admin/dashboard', icon: 'dashboard',      label: 'Dashboard' },
-  { to: '/admin/pelanggan', icon: 'group',           label: 'Pelanggan' },
-  { to: '/admin/paket',     icon: 'wifi',            label: 'Paket Internet' },
-  { to: '/admin/tagihan',   icon: 'receipt_long',    label: 'Tagihan & Pembayaran' },
-  { to: '/admin/pengaduan', icon: 'support_agent',   label: 'Pengaduan & Gangguan' },
+  { to: '/admin/dashboard', icon: 'dashboard',    label: 'Dashboard' },
+  { to: '/admin/pelanggan', icon: 'group',         label: 'Pelanggan' },
+  { to: '/admin/paket',     icon: 'wifi',          label: 'Paket Internet' },
+  { to: '/admin/tagihan',   icon: 'receipt_long',  label: 'Tagihan & Pembayaran' },
+  { to: '/admin/pengaduan', icon: 'support_agent', label: 'Pengaduan & Gangguan' },
 ]
 
 function handleLogout() {

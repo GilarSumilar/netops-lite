@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { formatDate } from '@/composables/useUtils.js'
 
 defineEmits(['toggle-sidebar'])
@@ -54,3 +54,4 @@ defineEmits(['toggle-sidebar'])
 const search = ref('')
 const today = formatDate(new Date())
 </script>
+
