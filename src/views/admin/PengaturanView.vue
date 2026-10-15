@@ -15,7 +15,7 @@
     </div>
     <!-- Profil -->
     <div v-if="activeTab === 'profil'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-surface-base rounded-xl border border-border-subtle p-6 shadow-sm flex flex-col items-center gap-4">
+      <div class="bg-surface-base rounded-xl border border-border-subtle p-6 shadow-sm flex flex-col items-center justify-center gap-4">
         <div class="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold ring-4 ring-primary-fixed text-2xl">{{ userInitials }}</div>
         <div class="text-center">
           <p class="font-headline-sm text-headline-sm text-text-primary font-bold">{{ profil.nama }}</p>
