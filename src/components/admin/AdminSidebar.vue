@@ -1,15 +1,27 @@
 <template>
-  <aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-base border-r border-border-subtle z-50 flex flex-col justify-between shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+  <aside
+    :class="[
+      'fixed left-0 top-0 bottom-0 w-64 bg-surface-base border-r border-border-subtle z-50 flex flex-col justify-between shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-transform duration-300',
+      sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+    ]"
+  >
     <div class="flex flex-col">
-      <!-- Logo -->
+      <!-- Logo + close button mobile -->
       <div class="h-16 px-space-md flex items-center gap-space-sm border-b border-border-subtle">
         <div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center shrink-0">
           <span class="material-symbols-outlined text-on-primary text-[20px]">router</span>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col flex-1 min-w-0">
           <span class="font-headline-sm text-headline-sm text-text-primary tracking-tight font-bold">NetOps Lite</span>
           <span class="font-label-sm text-label-sm text-text-muted">ISP &amp; RT-RW Management</span>
         </div>
+        <button
+          class="lg:hidden p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors shrink-0"
+          @click="sidebarOpen = false"
+          aria-label="Tutup menu"
+        >
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
       </div>
 
       <!-- Nav label -->
@@ -27,7 +39,7 @@
           v-slot="{ isActive, navigate }"
         >
           <a
-            @click="navigate"
+            @click="navigate(); sidebarOpen = false"
             :class="[
               'flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg transition-colors cursor-pointer',
               isActive
@@ -77,10 +89,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
+const sidebarOpen = inject('sidebar')
 const auth = useAuthStore()
 const router = useRouter()
 const user = computed(() => auth.user)
@@ -90,11 +103,11 @@ const userInitials = computed(() => {
 })
 
 const navItems = [
-  { to: '/admin/dashboard', icon: 'dashboard',      label: 'Dashboard' },
-  { to: '/admin/pelanggan', icon: 'group',           label: 'Pelanggan' },
-  { to: '/admin/paket',     icon: 'wifi',            label: 'Paket Internet' },
-  { to: '/admin/tagihan',   icon: 'receipt_long',    label: 'Tagihan & Pembayaran' },
-  { to: '/admin/pengaduan', icon: 'support_agent',   label: 'Pengaduan & Gangguan' },
+  { to: '/admin/dashboard', icon: 'dashboard',    label: 'Dashboard' },
+  { to: '/admin/pelanggan', icon: 'group',         label: 'Pelanggan' },
+  { to: '/admin/paket',     icon: 'wifi',          label: 'Paket Internet' },
+  { to: '/admin/tagihan',   icon: 'receipt_long',  label: 'Tagihan & Pembayaran' },
+  { to: '/admin/pengaduan', icon: 'support_agent', label: 'Pengaduan & Gangguan' },
 ]
 
 function handleLogout() {
