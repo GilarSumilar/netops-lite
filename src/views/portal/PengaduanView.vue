@@ -7,14 +7,17 @@
       <form @submit.prevent="submitTiket" class="flex flex-col gap-3">
         <div class="flex flex-col gap-1.5">
           <label class="font-label-md text-label-md text-text-primary" for="kat">Kategori Masalah</label>
-          <select v-model="form.kategori" id="kat" class="h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-container/20">
-            <option value="">Pilih kategori...</option>
-            <option>Koneksi Lambat</option>
-            <option>Internet Mati Total</option>
-            <option>Latensi/Ping Tinggi</option>
-            <option>Gangguan Fisik Kabel</option>
-            <option>Lainnya</option>
-          </select>
+          <div class="relative">
+            <select v-model="form.kategori" id="kat" class="h-10 w-full appearance-none px-3 pr-10 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-container/20">
+              <option value="">Pilih kategori...</option>
+              <option>Koneksi Lambat</option>
+              <option>Internet Mati Total</option>
+              <option>Latensi/Ping Tinggi</option>
+              <option>Gangguan Fisik Kabel</option>
+              <option>Lainnya</option>
+            </select>
+            <span class="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[20px] text-text-muted">expand_more</span>
+          </div>
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="font-label-md text-label-md text-text-primary" for="desc">Deskripsi Masalah</label>

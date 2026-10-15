@@ -32,7 +32,7 @@
       <button @click="showPasswordModal = true" class="h-11 rounded-lg border border-border-default font-label-lg text-text-body hover:border-border-default flex items-center justify-center gap-2 transition-all">
         <span class="material-symbols-outlined text-[18px]">lock</span> Ganti Kata Sandi
       </button>
-      <button @click="handleLogout" class="h-11 rounded-lg border border-status-danger-text/20 bg-status-danger-bg font-label-lg text-status-danger-text flex items-center justify-center gap-2 hover:bg-status-danger-text hover:text-on-error transition-all">
+      <button @click="handleLogout" type="button" class="h-11 rounded-full bg-[#FEF2F2] px-4 font-label-lg font-medium text-[#DC2626] flex items-center justify-center gap-2 hover:bg-[#FEE2E2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/30 transition-colors">
         <span class="material-symbols-outlined text-[18px]">logout</span> Keluar
       </button>
     </div>

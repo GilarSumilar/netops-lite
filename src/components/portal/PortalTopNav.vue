@@ -53,10 +53,10 @@
           </div>
           <span class="hidden lg:block font-label-md text-label-md text-text-primary">{{ user?.name }}</span>
         </div>
-        <a @click="handleLogout" class="hidden lg:flex items-center gap-1 font-label-md text-label-md text-status-danger-text hover:underline cursor-pointer">
-          <span class="material-symbols-outlined text-base">logout</span>
+        <button @click="handleLogout" type="button" class="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-[#FEF2F2] px-3.5 py-2 font-label-md text-label-md font-medium text-[#DC2626] transition-colors hover:bg-[#FEE2E2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/30">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
           Keluar
-        </a>
+        </button>
       </div>
     </div>
   </header>
