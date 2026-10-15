@@ -71,7 +71,7 @@
         </div>
       </div>
     </div>
-    <- Update plan-be.md: F7 marked Notifikasi -->
+    <!-- Update plan-be.md: F7 marked Notifikasi -->
     <div v-if="activeTab === 'notifikasi'" class="bg-surface-base rounded-xl border border-border-subtle p-6 shadow-sm flex flex-col gap-5">
       <h2 class="font-headline-sm text-headline-sm text-text-primary font-bold">Preferensi Notifikasi</h2>
       <div class="flex flex-col divide-y divide-border-subtle">
