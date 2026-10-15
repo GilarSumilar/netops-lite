@@ -1,8 +1,8 @@
 <template>
-  <div class="p-6 flex flex-col gap-5">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div><h2 class="font-headline-lg text-headline-lg text-text-primary">Paket Internet</h2><p class="font-body-sm text-body-sm text-text-body mt-0.5">Kelola daftar paket layanan dan harga</p></div>
-      <button @click="showTambahModal = true" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg hover:bg-primary transition-all shadow-sm"><span class="material-symbols-outlined text-lg">add</span><span>Tambah Paket</span></button>
+  <div class="flex min-w-0 flex-col gap-4 p-4 sm:gap-5 sm:p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div><h2 class="font-headline-lg text-headline-lg-mobile text-text-primary sm:text-headline-lg">Paket Internet</h2><p class="font-body-sm text-body-sm text-text-body mt-0.5">Kelola daftar paket layanan dan harga</p></div>
+      <button @click="showTambahModal = true" class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary-container px-4 font-label-lg text-on-primary shadow-sm transition-all hover:bg-primary sm:w-auto"><span class="material-symbols-outlined text-lg">add</span><span>Tambah Paket</span></button>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       <div v-for="p in pakets" :key="p.id" class="bg-surface-base rounded-xl border border-border-subtle p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
@@ -17,8 +17,8 @@
       </div>
     </div>
     <!-- Modal Tambah/Edit -->
-    <div v-if="showTambahModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="closePaketModal">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 p-6">
+    <div v-if="showTambahModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="closePaketModal">
+      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto flex flex-col gap-4 p-4 sm:p-6">
         <div class="flex items-center justify-between"><h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">{{ editTarget ? 'Edit Paket' : 'Tambah Paket Baru' }}</h3><button @click="closePaketModal" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted"><span class="material-symbols-outlined text-xl">close</span></button></div>
         <div class="flex flex-col gap-3">
           <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Nama Paket</label><input v-model="paketForm.name" type="text" placeholder="Fiber Pro 50 Mbps" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
@@ -29,8 +29,8 @@
       </div>
     </div>
     <!-- Konfirmasi Delete -->
-    <div v-if="deleteTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="deleteTarget = null">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-sm flex flex-col gap-4 p-6">
+    <div v-if="deleteTarget" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="deleteTarget = null">
+      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-sm flex flex-col gap-4 p-4 sm:p-6">
         <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Hapus Paket?</h3>
         <p class="font-body-md text-body-md text-text-body">Paket <strong>{{ deleteTarget.name }}</strong> akan dihapus permanen.</p>
         <div class="flex gap-3"><button @click="deleteTarget = null" class="flex-1 h-10 rounded-lg border border-border-default text-text-body font-label-md hover:bg-surface-container-low">Batal</button><button @click="confirmDelete" class="flex-1 h-10 rounded-lg bg-status-danger-text text-on-error font-label-md hover:opacity-90 shadow-sm">Hapus</button></div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full p-6 gap-6 max-w-[1440px] mx-auto">
+  <div class="flex w-full min-w-0 max-w-[1440px] flex-col gap-4 p-4 mx-auto sm:gap-6 sm:p-6">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col gap-1">
@@ -7,14 +7,14 @@
           <span>Admin</span><span class="material-symbols-outlined text-sm">chevron_right</span>
           <span class="text-primary-container font-semibold">Manajemen Pelanggan</span>
         </div>
-        <h1 class="font-headline-xl text-headline-xl text-text-primary tracking-tight">Data Pelanggan</h1>
+        <h1 class="font-headline-xl text-headline-xl-mobile text-text-primary tracking-tight sm:text-headline-xl">Data Pelanggan</h1>
         <p class="font-body-md text-body-md text-text-muted">Kelola data pelanggan, informasi paket, status layanan internet, dan alamat pemasangan.</p>
       </div>
-      <div class="flex items-center gap-3 shrink-0">
-        <button type="button" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-surface-base text-text-primary font-label-lg text-label-lg hover:bg-surface-container-low transition-colors shadow-sm">
+      <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:gap-3">
+        <button type="button" class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-surface-base px-3 text-text-primary font-label-lg text-label-lg shadow-sm transition-colors hover:bg-surface-container-low sm:flex-none sm:px-4">
           <span class="material-symbols-outlined text-xl text-text-body">download</span><span>Unduh Data</span>
         </button>
-        <button type="button" @click="showModal = true" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg hover:bg-primary transition-all shadow-sm">
+        <button type="button" @click="showModal = true" class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-primary-container px-3 text-on-primary font-label-lg text-label-lg shadow-sm transition-all hover:bg-primary sm:flex-none sm:px-4">
           <span class="material-symbols-outlined text-xl">person_add</span><span>Tambah Pelanggan</span>
         </button>
       </div>
@@ -46,7 +46,7 @@
           <select v-model="filterStatus" class="h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-sm text-text-primary focus:outline-none"><option value="">Semua Status</option><option value="aktif">Aktif</option><option value="suspend">Suspend</option><option value="isolir">Isolir</option></select>
         </div>
       </div>
-      <div class="overflow-x-auto"><table class="w-full"><thead><tr class="border-b border-border-subtle bg-surface-container-low"><th v-for="h in headers" :key="h" class="text-left px-4 py-3 font-label-md text-label-md text-text-muted">{{ h }}</th></tr></thead>
+      <div class="overflow-x-auto"><table class="w-full min-w-[720px]"><thead><tr class="border-b border-border-subtle bg-surface-container-low"><th v-for="h in headers" :key="h" class="text-left px-4 py-3 font-label-md text-label-md text-text-muted">{{ h }}</th></tr></thead>
       <tbody class="divide-y divide-border-subtle">
         <tr v-for="p in filtered" :key="p.id" class="hover:bg-surface-container-low transition-colors">
           <td class="px-4 py-3 font-label-sm text-label-sm text-text-muted">{{ p.id }}</td>
@@ -60,8 +60,8 @@
       </tbody></table></div>
     </div>
     <!-- Modal Tambah Pelanggan -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-lg flex flex-col gap-5 p-6">
+    <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showModal = false">
+      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto flex flex-col gap-5 p-4 sm:p-6">
         <div class="flex items-center justify-between"><h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Tambah Pelanggan Baru</h3><button @click="showModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5 sm:col-span-2"><label class="font-label-md text-label-md text-text-primary">Nama Lengkap</label><input v-model="newPel.name" type="text" placeholder="Bpk./Ibu ..." class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
