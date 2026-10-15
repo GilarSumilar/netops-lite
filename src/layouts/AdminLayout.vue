@@ -23,3 +23,4 @@ import AdminHeader from '@/components/admin/AdminHeader.vue'
 
 const isSidebarOpen = ref(false)
 </script>
+

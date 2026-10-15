@@ -25,12 +25,12 @@
         </tr></thead>
         <tbody class="divide-y divide-border-subtle">
           <tr v-for="t in tagihans" :key="t.id" class="hover:bg-surface-container-low transition-colors">
-            <td class="px-4 py-3 font-label-sm text-label-sm text-text-muted">{{ t.id }}</td>
-            <td class="px-4 py-3 font-body-md text-body-md text-text-primary">{{ t.nama }}</td>
-            <td class="px-4 py-3 font-body-md text-body-md text-text-primary">{{ t.periode }}</td>
-            <td class="px-4 py-3 font-label-md text-label-md text-text-primary font-semibold">{{ t.nominal }}</td>
-            <td class="px-4 py-3"><span :class="['inline-flex px-2 py-0.5 rounded-full font-label-sm', sCls[t.status]]">{{ t.status }}</span></td>
-            <td class="px-4 py-3 flex gap-1">
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-label-sm text-label-sm text-text-muted whitespace-nowrap">{{ t.id }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-body-md text-body-md text-text-primary whitespace-nowrap">{{ t.nama }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-body-md text-body-md text-text-primary whitespace-nowrap">{{ t.periode }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-label-md text-label-md text-text-primary font-semibold whitespace-nowrap">{{ t.nominal }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3"><span :class="['inline-flex px-2 py-0.5 rounded-full font-label-sm whitespace-nowrap', sCls[t.status]]">{{ t.status }}</span></td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 flex gap-1">
               <button class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary" title="Kuitansi"><span class="material-symbols-outlined text-[18px]">receipt</span></button>
             </td>
           </tr>
