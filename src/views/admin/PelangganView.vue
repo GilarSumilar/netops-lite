@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full p-6 gap-6 max-w-[1440px] mx-auto">
+  <div class="flex flex-col w-full p-4 md:p-6 gap-5 md:gap-6 max-w-[1440px] mx-auto">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col gap-1">
@@ -8,13 +8,13 @@
           <span class="text-primary-container font-semibold">Manajemen Pelanggan</span>
         </div>
         <h1 class="font-headline-xl text-headline-xl text-text-primary tracking-tight">Data Pelanggan</h1>
-        <p class="font-body-md text-body-md text-text-muted">Kelola data pelanggan, informasi paket, status layanan internet, dan alamat pemasangan.</p>
+        <p class="font-body-md text-body-md text-text-muted hidden sm:block">Kelola data pelanggan, informasi paket, status layanan internet, dan alamat pemasangan.</p>
       </div>
-      <div class="flex items-center gap-3 shrink-0">
-        <button type="button" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-surface-base text-text-primary font-label-lg text-label-lg hover:bg-surface-container-low transition-colors shadow-sm">
-          <span class="material-symbols-outlined text-xl text-text-body">download</span><span>Unduh Data</span>
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 shrink-0">
+        <button type="button" class="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-surface-base text-text-primary font-label-lg text-label-lg hover:bg-surface-container-low transition-colors shadow-sm">
+          <span class="material-symbols-outlined text-xl text-text-body">download</span><span class="hidden sm:inline">Unduh Data</span><span class="sm:hidden">Unduh</span>
         </button>
-        <button type="button" @click="showModal = true" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg hover:bg-primary transition-all shadow-sm">
+        <button type="button" @click="showModal = true" class="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg hover:bg-primary transition-all shadow-sm">
           <span class="material-symbols-outlined text-xl">person_add</span><span>Tambah Pelanggan</span>
         </button>
       </div>
@@ -46,15 +46,15 @@
           <select v-model="filterStatus" class="h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-sm text-text-primary focus:outline-none"><option value="">Semua Status</option><option value="aktif">Aktif</option><option value="suspend">Suspend</option><option value="isolir">Isolir</option></select>
         </div>
       </div>
-      <div class="overflow-x-auto"><table class="w-full"><thead><tr class="border-b border-border-subtle bg-surface-container-low"><th v-for="h in headers" :key="h" class="text-left px-4 py-3 font-label-md text-label-md text-text-muted">{{ h }}</th></tr></thead>
+      <div class="overflow-x-auto"><table class="w-full"><thead><tr class="border-b border-border-subtle bg-surface-container-low"><th v-for="h in headers" :key="h" class="text-left px-3 md:px-4 py-3 font-label-md text-label-md text-text-muted whitespace-nowrap">{{ h }}</th></tr></thead>
       <tbody class="divide-y divide-border-subtle">
         <tr v-for="p in filtered" :key="p.id" class="hover:bg-surface-container-low transition-colors">
-          <td class="px-4 py-3 font-label-sm text-label-sm text-text-muted">{{ p.id }}</td>
-          <td class="px-4 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-sm font-bold shrink-0">{{ p.initials }}</div><div><p class="font-label-md text-label-md text-text-primary">{{ p.name }}</p><p class="font-body-sm text-body-sm text-text-muted">{{ p.address }}</p></div></div></td>
-          <td class="px-4 py-3 font-body-md text-body-md text-text-primary">{{ p.paket }}</td>
-          <td class="px-4 py-3"><span :class="['inline-flex px-2 py-0.5 rounded-full font-label-sm', sCls[p.status]]">{{ p.status }}</span></td>
-          <td class="px-4 py-3 font-body-md" :class="p.tagihan > 0 ? 'text-status-danger-text' : 'text-status-success-text'">{{ p.tagihan > 0 ? 'Rp ' + p.tagihan.toLocaleString('id-ID') : 'Lunas' }}</td>
-          <td class="px-4 py-3"><div class="flex gap-1"><button class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary" title="Detail"><span class="material-symbols-outlined text-[18px]">visibility</span></button><button class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button></div></td>
+          <td class="px-3 md:px-4 py-2.5 md:py-3 font-label-sm text-label-sm text-text-muted whitespace-nowrap">{{ p.id }}</td>
+          <td class="px-3 md:px-4 py-2.5 md:py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-sm font-bold shrink-0">{{ p.initials }}</div><div class="min-w-0"><p class="font-label-md text-label-md text-text-primary whitespace-nowrap">{{ p.name }}</p><p class="font-body-sm text-body-sm text-text-muted truncate max-w-[160px] md:max-w-none">{{ p.address }}</p></div></div></td>
+          <td class="px-3 md:px-4 py-2.5 md:py-3 font-body-md text-body-md text-text-primary whitespace-nowrap">{{ p.paket }}</td>
+          <td class="px-3 md:px-4 py-2.5 md:py-3"><span :class="['inline-flex px-2 py-0.5 rounded-full font-label-sm whitespace-nowrap', sCls[p.status]]">{{ p.status }}</span></td>
+          <td class="px-3 md:px-4 py-2.5 md:py-3 font-body-md whitespace-nowrap" :class="p.tagihan > 0 ? 'text-status-danger-text' : 'text-status-success-text'">{{ p.tagihan > 0 ? 'Rp ' + p.tagihan.toLocaleString('id-ID') : 'Lunas' }}</td>
+          <td class="px-3 md:px-4 py-2.5 md:py-3"><div class="flex gap-1"><button class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary" title="Detail"><span class="material-symbols-outlined text-[18px]">visibility</span></button><button class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button></div></td>
         </tr>
         <tr v-if="!filtered.length"><td colspan="6" class="px-4 py-8 text-center font-body-md text-body-md text-text-muted">Tidak ada data ditemukan</td></tr>
       </tbody></table></div>
