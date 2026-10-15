@@ -1,16 +1,16 @@
 <template>
-  <div class="p-6 flex flex-col gap-5">
-    <div class="flex items-center justify-between flex-wrap gap-3">
+  <div class="p-4 md:p-6 flex flex-col gap-5">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
         <h2 class="font-headline-lg text-headline-lg text-text-primary">Tagihan &amp; Pembayaran</h2>
         <p class="font-body-sm text-body-sm text-text-body mt-0.5">Pantau status tagihan dan catat pembayaran pelanggan</p>
       </div>
-      <button @click="showCatatModal = true" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg hover:bg-primary transition-all shadow-sm">
+      <button @click="showCatatModal = true" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg hover:bg-primary transition-all shadow-sm">
         <span class="material-symbols-outlined text-lg">add</span><span>Catat Pembayaran</span>
       </button>
     </div>
     <!-- Summary cards -->
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
       <div v-for="s in summary" :key="s.label" :class="['rounded-xl p-4 border flex flex-col gap-1', s.bg]">
         <span class="font-label-md text-label-md" :class="s.textMuted">{{ s.label }}</span>
         <span class="font-headline-md text-headline-md font-bold" :class="s.textMain">{{ s.value }}</span>
@@ -25,12 +25,12 @@
         </tr></thead>
         <tbody class="divide-y divide-border-subtle">
           <tr v-for="t in tagihans" :key="t.id" class="hover:bg-surface-container-low transition-colors">
-            <td class="px-4 py-3 font-label-sm text-label-sm text-text-muted">{{ t.id }}</td>
-            <td class="px-4 py-3 font-body-md text-body-md text-text-primary">{{ t.nama }}</td>
-            <td class="px-4 py-3 font-body-md text-body-md text-text-primary">{{ t.periode }}</td>
-            <td class="px-4 py-3 font-label-md text-label-md text-text-primary font-semibold">{{ t.nominal }}</td>
-            <td class="px-4 py-3"><span :class="['inline-flex px-2 py-0.5 rounded-full font-label-sm', sCls[t.status]]">{{ t.status }}</span></td>
-            <td class="px-4 py-3 flex gap-1">
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-label-sm text-label-sm text-text-muted whitespace-nowrap">{{ t.id }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-body-md text-body-md text-text-primary whitespace-nowrap">{{ t.nama }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-body-md text-body-md text-text-primary whitespace-nowrap">{{ t.periode }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 font-label-md text-label-md text-text-primary font-semibold whitespace-nowrap">{{ t.nominal }}</td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3"><span :class="['inline-flex px-2 py-0.5 rounded-full font-label-sm whitespace-nowrap', sCls[t.status]]">{{ t.status }}</span></td>
+            <td class="px-3 md:px-4 py-2.5 md:py-3 flex gap-1">
               <button class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary" title="Kuitansi"><span class="material-symbols-outlined text-[18px]">receipt</span></button>
             </td>
           </tr>

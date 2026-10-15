@@ -1,12 +1,12 @@
 <template>
-  <div class="p-6 flex flex-col gap-5">
-    <div class="flex items-center justify-between flex-wrap gap-3">
+  <div class="p-4 md:p-6 flex flex-col gap-5">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
         <h2 class="font-headline-lg text-headline-lg text-text-primary">Pengaduan &amp; Gangguan</h2>
         <p class="font-body-sm text-body-sm text-text-body mt-0.5">Kelola tiket pengaduan dan gangguan jaringan pelanggan</p>
       </div>
       <div class="flex gap-2">
-        <select v-model="filterStatus" class="h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-sm text-text-primary focus:outline-none">
+        <select v-model="filterStatus" class="w-full sm:w-auto h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-sm text-text-primary focus:outline-none">
           <option value="">Semua Status</option>
           <option value="baru">Baru</option>
           <option value="proses">Dalam Proses</option>

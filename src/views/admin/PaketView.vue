@@ -1,8 +1,8 @@
 <template>
-  <div class="p-6 flex flex-col gap-5">
-    <div class="flex items-center justify-between flex-wrap gap-3">
+  <div class="p-4 md:p-6 flex flex-col gap-5">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div><h2 class="font-headline-lg text-headline-lg text-text-primary">Paket Internet</h2><p class="font-body-sm text-body-sm text-text-body mt-0.5">Kelola daftar paket layanan dan harga</p></div>
-      <button @click="showTambahModal = true" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg hover:bg-primary transition-all shadow-sm"><span class="material-symbols-outlined text-lg">add</span><span>Tambah Paket</span></button>
+      <button @click="showTambahModal = true" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg hover:bg-primary transition-all shadow-sm"><span class="material-symbols-outlined text-lg">add</span><span>Tambah Paket</span></button>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       <div v-for="p in pakets" :key="p.id" class="bg-surface-base rounded-xl border border-border-subtle p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
