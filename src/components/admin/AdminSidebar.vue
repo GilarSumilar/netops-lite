@@ -1,10 +1,8 @@
 <template>
-  <aside
-    :class="[
-      'fixed left-0 top-0 bottom-0 w-64 bg-surface-base border-r border-border-subtle z-50 flex flex-col justify-between shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-transform duration-300',
-      sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-    ]"
-  >
+  <aside :class="[
+    'fixed inset-y-0 left-0 z-[60] flex w-64 flex-col justify-between border-r border-border-subtle bg-surface-base shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-transform duration-200 md:translate-x-0',
+    open ? 'translate-x-0' : '-translate-x-full'
+  ]">
     <div class="flex flex-col">
       <!-- Logo + close button mobile -->
       <div class="h-16 px-space-md flex items-center gap-space-sm border-b border-border-subtle">
@@ -39,7 +37,7 @@
           v-slot="{ isActive, navigate }"
         >
           <a
-            @click="navigate(); sidebarOpen = false"
+            @click="navigateAndClose(navigate)"
             :class="[
               'flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg transition-colors cursor-pointer',
               isActive
@@ -93,7 +91,14 @@ import { computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-const sidebarOpen = inject('sidebar')
+defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
+const emit = defineEmits(['close'])
+
 const auth = useAuthStore()
 const router = useRouter()
 const user = computed(() => auth.user)
@@ -101,6 +106,11 @@ const userInitials = computed(() => {
   if (!user.value?.name) return 'A'
   return user.value.name.split(' ').map(w => w[0]).slice(0, 2).join('')
 })
+
+function navigateAndClose(navigate) {
+  navigate()
+  emit('close')
+}
 
 const navItems = [
   { to: '/admin/dashboard', icon: 'dashboard',    label: 'Dashboard' },

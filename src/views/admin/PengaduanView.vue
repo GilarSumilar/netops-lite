@@ -1,12 +1,12 @@
 <template>
-  <div class="p-4 md:p-6 flex flex-col gap-5">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="flex min-w-0 flex-col gap-4 p-4 sm:gap-5 sm:p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="font-headline-lg text-headline-lg text-text-primary">Pengaduan &amp; Gangguan</h2>
+        <h2 class="font-headline-lg text-headline-lg-mobile text-text-primary sm:text-headline-lg">Pengaduan &amp; Gangguan</h2>
         <p class="font-body-sm text-body-sm text-text-body mt-0.5">Kelola tiket pengaduan dan gangguan jaringan pelanggan</p>
       </div>
       <div class="flex gap-2">
-        <select v-model="filterStatus" class="w-full sm:w-auto h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-sm text-text-primary focus:outline-none">
+        <select v-model="filterStatus" class="h-10 w-full rounded-lg border border-border-default bg-surface-base px-3 font-body-sm text-text-primary focus:outline-none sm:w-auto">
           <option value="">Semua Status</option>
           <option value="baru">Baru</option>
           <option value="proses">Dalam Proses</option>
@@ -17,7 +17,7 @@
     <div class="flex flex-col gap-3">
       <div v-for="t in filtered" :key="t.id"
         class="bg-surface-base rounded-xl border border-border-subtle p-4 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-start justify-between gap-3">
+        <div class="flex flex-col items-start justify-between gap-3 sm:flex-row">
           <div class="flex items-start gap-3 flex-1 min-w-0">
             <div :class="['w-9 h-9 rounded-lg flex items-center justify-center shrink-0', prioCls[t.prioritas].bg]">
               <span class="material-symbols-outlined text-[18px]" :class="prioCls[t.prioritas].icon">{{ t.iconName }}</span>
@@ -31,9 +31,9 @@
               <p class="font-body-sm text-body-sm text-text-body mt-1">{{ t.desc }}</p>
             </div>
           </div>
-          <span :class="['px-2.5 py-1 rounded-full font-label-sm text-label-sm whitespace-nowrap', sCls[t.status]]">{{ t.status }}</span>
+          <span :class="['shrink-0 px-2.5 py-1 rounded-full font-label-sm text-label-sm whitespace-nowrap sm:self-start', sCls[t.status]]">{{ t.status }}</span>
         </div>
-        <div class="flex items-center justify-between pt-2 border-t border-border-subtle">
+        <div class="flex flex-col gap-2 border-t border-border-subtle pt-2 sm:flex-row sm:items-center sm:justify-between">
           <span class="font-body-sm text-body-sm text-text-muted">{{ t.pelanggan }} • {{ t.waktu }}</span>
           <button @click="openTangani(t)" class="inline-flex items-center gap-1 h-8 px-3 rounded-lg bg-primary-container/10 text-primary-container font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all">
             <span class="material-symbols-outlined text-[16px]">open_in_new</span> Tangani
@@ -42,8 +42,8 @@
       </div>
     </div>
     <!-- Modal Tangani Tiket -->
-    <div v-if="showTanganiModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showTanganiModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 p-6">
+    <div v-if="showTanganiModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showTanganiModal = false">
+      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto flex flex-col gap-4 p-4 sm:p-6">
         <div class="flex items-center justify-between">
           <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Tangani Tiket</h3>
           <button @click="showTanganiModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button>

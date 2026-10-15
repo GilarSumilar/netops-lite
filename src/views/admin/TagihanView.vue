@@ -1,16 +1,16 @@
 <template>
-  <div class="p-4 md:p-6 flex flex-col gap-5">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="flex min-w-0 flex-col gap-4 p-4 sm:gap-5 sm:p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="font-headline-lg text-headline-lg text-text-primary">Tagihan &amp; Pembayaran</h2>
+        <h2 class="font-headline-lg text-headline-lg-mobile text-text-primary sm:text-headline-lg">Tagihan &amp; Pembayaran</h2>
         <p class="font-body-sm text-body-sm text-text-body mt-0.5">Pantau status tagihan dan catat pembayaran pelanggan</p>
       </div>
-      <button @click="showCatatModal = true" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary-container text-on-primary font-label-lg hover:bg-primary transition-all shadow-sm">
+      <button @click="showCatatModal = true" class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary-container px-4 font-label-lg text-on-primary shadow-sm transition-all hover:bg-primary sm:w-auto">
         <span class="material-symbols-outlined text-lg">add</span><span>Catat Pembayaran</span>
       </button>
     </div>
     <!-- Summary cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
       <div v-for="s in summary" :key="s.label" :class="['rounded-xl p-4 border flex flex-col gap-1', s.bg]">
         <span class="font-label-md text-label-md" :class="s.textMuted">{{ s.label }}</span>
         <span class="font-headline-md text-headline-md font-bold" :class="s.textMain">{{ s.value }}</span>
@@ -19,7 +19,7 @@
     </div>
     <!-- Table -->
     <div class="bg-surface-base rounded-xl border border-border-subtle overflow-x-auto">
-      <table class="w-full">
+      <table class="w-full min-w-[640px]">
         <thead><tr class="border-b border-border-subtle bg-surface-container-low">
           <th v-for="h in headers" :key="h" class="text-left px-4 py-3 font-label-md text-label-md text-text-muted">{{ h }}</th>
         </tr></thead>
@@ -38,8 +38,8 @@
       </table>
     </div>
     <!-- Modal Catat Pembayaran -->
-    <div v-if="showCatatModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showCatatModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-5 p-6">
+    <div v-if="showCatatModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showCatatModal = false">
+      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto flex flex-col gap-5 p-4 sm:p-6">
         <div class="flex items-center justify-between">
           <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Catat Pembayaran</h3>
           <button @click="showCatatModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button>
