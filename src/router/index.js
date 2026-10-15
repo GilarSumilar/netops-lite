@@ -18,7 +18,8 @@ const router = createRouter({
         { path: 'pelanggan', name: 'admin-pelanggan', component: () => import('@/views/admin/PelangganView.vue') },
         { path: 'paket',     name: 'admin-paket',     component: () => import('@/views/admin/PaketView.vue') },
         { path: 'tagihan',   name: 'admin-tagihan',   component: () => import('@/views/admin/TagihanView.vue') },
-        { path: 'pengaduan', name: 'admin-pengaduan', component: () => import('@/views/admin/PengaduanView.vue') },
+        { path: 'pengaduan',  name: 'admin-pengaduan',  component: () => import('@/views/admin/PengaduanView.vue') },
+        { path: 'pengaturan', name: 'admin-pengaturan', component: () => import('@/views/admin/PengaturanView.vue') },
       ],
     },
     {

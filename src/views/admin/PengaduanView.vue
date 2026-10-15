@@ -1,17 +1,17 @@
 <template>
-  <div class="flex min-w-0 flex-col gap-4 p-4 sm:gap-5 sm:p-6">
+  <div class="flex min-w-0 flex-col gap-4 p-4 sm:gap-6 sm:p-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="font-headline-lg text-headline-lg-mobile text-text-primary sm:text-headline-lg">Pengaduan &amp; Gangguan</h2>
         <p class="font-body-sm text-body-sm text-text-body mt-0.5">Kelola tiket pengaduan dan gangguan jaringan pelanggan</p>
       </div>
       <div class="flex gap-2">
-        <select v-model="filterStatus" class="h-10 w-full rounded-lg border border-border-default bg-surface-base px-3 font-body-sm text-text-primary focus:outline-none sm:w-auto">
+        <AppSelect v-model="filterStatus" class="w-full sm:w-auto">
           <option value="">Semua Status</option>
           <option value="baru">Baru</option>
           <option value="proses">Dalam Proses</option>
           <option value="selesai">Selesai</option>
-        </select>
+        </AppSelect>
       </div>
     </div>
     <div class="flex flex-col gap-3">
@@ -35,47 +35,42 @@
         </div>
         <div class="flex flex-col gap-2 border-t border-border-subtle pt-2 sm:flex-row sm:items-center sm:justify-between">
           <span class="font-body-sm text-body-sm text-text-muted">{{ t.pelanggan }} • {{ t.waktu }}</span>
-          <button @click="openTangani(t)" class="inline-flex items-center gap-1 h-8 px-3 rounded-lg bg-primary-container/10 text-primary-container font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all">
+          <AppButton variant="ghost" size="sm" @click="openTangani(t)">
             <span class="material-symbols-outlined text-[16px]">open_in_new</span> Tangani
-          </button>
+          </AppButton>
         </div>
       </div>
     </div>
     <!-- Modal Tangani Tiket -->
-    <div v-if="showTanganiModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showTanganiModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto flex flex-col gap-4 p-4 sm:p-6">
-        <div class="flex items-center justify-between">
-          <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Tangani Tiket</h3>
-          <button @click="showTanganiModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button>
-        </div>
-        <div v-if="activeTiket" class="bg-surface-container-low rounded-xl p-3 flex flex-col gap-1">
-          <span class="font-label-sm text-label-sm text-text-muted">{{ activeTiket.id }}</span>
-          <p class="font-label-md text-label-md text-text-primary">{{ activeTiket.judul }}</p>
-          <p class="font-body-sm text-body-sm text-text-body">{{ activeTiket.pelanggan }}</p>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label class="font-label-md text-label-md text-text-primary">Update Status</label>
-          <select v-model="tanganiForm.status" class="h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container">
-            <option value="baru">Baru</option>
-            <option value="proses">Dalam Proses</option>
-            <option value="selesai">Selesai</option>
-          </select>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label class="font-label-md text-label-md text-text-primary">Catatan Penanganan</label>
-          <textarea v-model="tanganiForm.catatan" rows="3" placeholder="Jelaskan langkah penanganan..." class="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container resize-none"></textarea>
-        </div>
-        <div class="flex gap-3">
-          <button @click="showTanganiModal = false" class="flex-1 h-10 rounded-lg border border-border-default text-text-body font-label-md hover:bg-surface-container-low transition-colors">Batal</button>
-          <button @click="submitTangani" class="flex-1 h-10 rounded-lg bg-primary-container text-on-primary font-label-md hover:bg-primary transition-all shadow-sm">Simpan Update</button>
-        </div>
+    <AppModal v-model="showTanganiModal" title="Tangani Tiket">
+      <div v-if="activeTiket" class="bg-surface-container-low rounded-xl p-3 flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-text-muted">{{ activeTiket.id }}</span>
+        <p class="font-label-md text-label-md text-text-primary">{{ activeTiket.judul }}</p>
+        <p class="font-body-sm text-body-sm text-text-body">{{ activeTiket.pelanggan }}</p>
       </div>
-    </div>
+      <AppSelect v-model="tanganiForm.status" label="Update Status">
+        <option value="baru">Baru</option>
+        <option value="proses">Dalam Proses</option>
+        <option value="selesai">Selesai</option>
+      </AppSelect>
+      <div class="flex flex-col gap-1.5">
+        <label class="font-label-md text-label-md text-text-primary">Catatan Penanganan</label>
+        <textarea v-model="tanganiForm.catatan" rows="3" placeholder="Jelaskan langkah penanganan..."
+          class="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container resize-none"></textarea>
+      </div>
+      <div class="flex gap-3">
+        <AppButton variant="outline" :full="true" @click="showTanganiModal = false">Batal</AppButton>
+        <AppButton :full="true" @click="submitTangani">Simpan Update</AppButton>
+      </div>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
+import AppButton from '@/components/AppButton.vue'
+import AppSelect from '@/components/AppSelect.vue'
+import AppModal  from '@/components/AppModal.vue'
 const filterStatus = ref('')
 const showTanganiModal = ref(false)
 const activeTiket = ref(null)

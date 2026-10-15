@@ -7,14 +7,14 @@
       <form @submit.prevent="submitTiket" class="flex flex-col gap-3">
         <div class="flex flex-col gap-1.5">
           <label class="font-label-md text-label-md text-text-primary" for="kat">Kategori Masalah</label>
-          <select v-model="form.kategori" id="kat" class="h-10 px-3 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-container/20">
-            <option value="">Pilih kategori...</option>
-            <option>Koneksi Lambat</option>
-            <option>Internet Mati Total</option>
-            <option>Latensi/Ping Tinggi</option>
-            <option>Gangguan Fisik Kabel</option>
-            <option>Lainnya</option>
-          </select>
+        <AppSelect v-model="form.kategori" id="kat">
+          <option value="">Pilih kategori...</option>
+          <option>Koneksi Lambat</option>
+          <option>Internet Mati Total</option>
+          <option>Latensi/Ping Tinggi</option>
+          <option>Gangguan Fisik Kabel</option>
+          <option>Lainnya</option>
+        </AppSelect>
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="font-label-md text-label-md text-text-primary" for="desc">Deskripsi Masalah</label>
@@ -22,14 +22,14 @@
             class="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container resize-none transition-all"></textarea>
         </div>
         <p v-if="submitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg">Tiket berhasil dikirim! Tim kami akan menghubungi Anda.</p>
-        <button type="submit" class="h-11 rounded-lg bg-primary-container text-on-primary font-label-lg flex items-center justify-center gap-2 hover:bg-primary transition-all shadow-sm">
+        <AppButton type="submit" :full="true" size="lg">
           <span class="material-symbols-outlined text-[18px]">send</span> Kirim Laporan
-        </button>
+        </AppButton>
       </form>
     </div>
     <!-- Histori tiket -->
-    <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm">
-      <h3 class="font-headline-sm text-headline-sm text-text-primary mb-3">Riwayat Tiket</h3>
+    <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-4">
+      <h3 class="font-headline-sm text-headline-sm text-text-primary">Riwayat Tiket</h3>
       <div class="flex flex-col divide-y divide-border-subtle">
         <div v-for="t in tikets" :key="t.id" class="py-3 flex items-start justify-between gap-3">
           <div>
@@ -45,6 +45,8 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import AppButton from '@/components/AppButton.vue'
+import AppSelect from '@/components/AppSelect.vue'
 const form = reactive({ kategori: '', deskripsi: '' })
 const submitted = ref(false)
 const sCls = { Baru:'bg-primary-fixed text-primary', 'Dalam Proses':'bg-status-warning-bg text-status-warning-text', Selesai:'bg-status-success-bg text-status-success-text' }
