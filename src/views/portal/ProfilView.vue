@@ -26,50 +26,44 @@
     </div>
     <!-- Actions -->
     <div class="flex flex-col gap-2">
-      <button @click="showEditModal = true" class="h-11 rounded-lg border border-border-default font-label-lg text-text-body hover:border-primary-container hover:text-primary-container flex items-center justify-center gap-2 transition-all">
+      <AppButton variant="outline" :full="true" size="lg" @click="openEdit">
         <span class="material-symbols-outlined text-[18px]">edit</span> Edit Profil
-      </button>
-      <button @click="showPasswordModal = true" class="h-11 rounded-lg border border-border-default font-label-lg text-text-body hover:border-border-default flex items-center justify-center gap-2 transition-all">
+      </AppButton>
+      <AppButton variant="outline" :full="true" size="lg" @click="showPasswordModal = true">
         <span class="material-symbols-outlined text-[18px]">lock</span> Ganti Kata Sandi
-      </button>
-      <button @click="handleLogout" class="h-11 rounded-lg border border-status-danger-text/20 bg-status-danger-bg font-label-lg text-status-danger-text flex items-center justify-center gap-2 hover:bg-status-danger-text hover:text-on-error transition-all">
+      </AppButton>
+      <AppButton variant="danger" :full="true" size="lg" @click="handleLogout">
         <span class="material-symbols-outlined text-[18px]">logout</span> Keluar
-      </button>
+      </AppButton>
     </div>
     <!-- Modal Edit Profil -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showEditModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 p-6">
-        <div class="flex items-center justify-between">
-          <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Edit Profil</h3>
-          <button @click="showEditModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button>
-        </div>
-        <div class="flex flex-col gap-3">
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Nama Lengkap</label><input v-model="editForm.name" type="text" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">No. Telepon</label><input v-model="editForm.phone" type="text" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Email</label><input v-model="editForm.email" type="email" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Alamat</label><input v-model="editForm.address" type="text" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-        </div>
-        <p v-if="editSubmitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg">Profil berhasil diperbarui.</p>
-        <div class="flex gap-3"><button @click="showEditModal = false" class="flex-1 h-10 rounded-lg border border-border-default text-text-body font-label-md hover:bg-surface-container-low transition-colors">Batal</button><button @click="submitEdit" class="flex-1 h-10 rounded-lg bg-primary-container text-on-primary font-label-md hover:bg-primary transition-all shadow-sm">Simpan</button></div>
+    <AppModal v-model="showEditModal" title="Edit Profil">
+      <div class="flex flex-col gap-3">
+        <AppInput v-model="editForm.name" label="Nama Lengkap" />
+        <AppInput v-model="editForm.phone" label="No. Telepon" />
+        <AppInput v-model="editForm.email" label="Email" type="email" />
+        <AppInput v-model="editForm.address" label="Alamat" />
       </div>
-    </div>
+      <p v-if="editSubmitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg">Profil berhasil diperbarui.</p>
+      <div class="flex gap-3">
+        <AppButton variant="outline" :full="true" @click="showEditModal = false">Batal</AppButton>
+        <AppButton :full="true" @click="submitEdit">Simpan</AppButton>
+      </div>
+    </AppModal>
     <!-- Modal Ganti Kata Sandi -->
-    <div v-if="showPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showPasswordModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-4 p-6">
-        <div class="flex items-center justify-between">
-          <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Ganti Kata Sandi</h3>
-          <button @click="showPasswordModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button>
-        </div>
-        <div class="flex flex-col gap-3">
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Kata Sandi Lama</label><input v-model="passForm.lama" type="password" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Kata Sandi Baru</label><input v-model="passForm.baru" type="password" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-          <div class="flex flex-col gap-1.5"><label class="font-label-md text-label-md text-text-primary">Konfirmasi Kata Sandi Baru</label><input v-model="passForm.konfirmasi" type="password" class="h-10 px-3.5 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" /></div>
-        </div>
-        <p v-if="passSubmitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg">Kata sandi berhasil diubah.</p>
-        <p v-if="passForm.baru && passForm.konfirmasi && passForm.baru !== passForm.konfirmasi" class="font-body-sm text-body-sm text-status-danger-text bg-status-danger-bg px-3 py-2 rounded-lg">Konfirmasi kata sandi tidak cocok.</p>
-        <div class="flex gap-3"><button @click="showPasswordModal = false" class="flex-1 h-10 rounded-lg border border-border-default text-text-body font-label-md hover:bg-surface-container-low transition-colors">Batal</button><button @click="submitPassword" class="flex-1 h-10 rounded-lg bg-primary-container text-on-primary font-label-md hover:bg-primary transition-all shadow-sm">Simpan</button></div>
+    <AppModal v-model="showPasswordModal" title="Ganti Kata Sandi">
+      <div class="flex flex-col gap-3">
+        <AppInput v-model="passForm.lama" label="Kata Sandi Lama" type="password" />
+        <AppInput v-model="passForm.baru" label="Kata Sandi Baru" type="password" />
+        <AppInput v-model="passForm.konfirmasi" label="Konfirmasi Kata Sandi Baru" type="password" />
       </div>
-    </div>
+      <p v-if="passSubmitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg">Kata sandi berhasil diubah.</p>
+      <p v-if="passForm.baru && passForm.konfirmasi && passForm.baru !== passForm.konfirmasi" class="font-body-sm text-body-sm text-status-danger-text bg-status-danger-bg px-3 py-2 rounded-lg">Konfirmasi kata sandi tidak cocok.</p>
+      <div class="flex gap-3">
+        <AppButton variant="outline" :full="true" @click="showPasswordModal = false">Batal</AppButton>
+        <AppButton :full="true" @click="submitPassword">Simpan</AppButton>
+      </div>
+    </AppModal>
   </div>
 </template>
 
@@ -77,6 +71,9 @@
 import { computed, ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import AppButton from '@/components/AppButton.vue'
+import AppInput  from '@/components/AppInput.vue'
+import AppModal  from '@/components/AppModal.vue'
 const auth = useAuthStore(), router = useRouter()
 const user = computed(() => auth.user)
 const showEditModal = ref(false)
