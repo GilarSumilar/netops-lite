@@ -56,10 +56,14 @@
         <span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted font-bold">Sistem</span>
       </div>
       <nav class="flex flex-col gap-space-xs px-space-sm">
-        <a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg text-text-body hover:bg-surface-container-low hover:text-text-primary transition-colors cursor-pointer">
-          <span class="material-symbols-outlined text-xl">settings</span>
-          <span>Pengaturan Akun</span>
-        </a>
+        <RouterLink to="/admin/pengaturan" custom v-slot="{ isActive, navigate }">
+          <a @click="navigateAndClose(navigate)"
+            :class="['flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg transition-colors cursor-pointer',
+              isActive ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-text-body hover:bg-surface-container-low hover:text-text-primary']">
+            <span class="material-symbols-outlined text-xl">settings</span>
+            <span>Pengaturan</span>
+          </a>
+        </RouterLink>
         <a
           @click="handleLogout"
           class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg text-text-body hover:bg-status-danger-bg hover:text-status-danger-text transition-colors cursor-pointer"
@@ -71,32 +75,45 @@
     </div>
 
     <!-- User profile footer -->
-    <div class="p-space-md border-t border-border-subtle bg-surface-container-lowest flex items-center justify-between">
-      <div class="flex items-center gap-space-sm min-w-0">
-        <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-md font-bold shrink-0">
-          {{ userInitials }}
+    <div class="p-space-md border-t border-border-subtle bg-surface-container-lowest">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-md font-bold shrink-0">
+            {{ userInitials }}
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="font-label-md text-label-md text-text-primary truncate font-bold">{{ user?.name }}</span>
+            <span class="font-label-sm text-label-sm text-text-muted truncate">{{ user?.title }}</span>
+          </div>
         </div>
-        <div class="flex flex-col min-w-0">
-          <span class="font-label-md text-label-md text-text-primary truncate font-bold">{{ user?.name }}</span>
-          <span class="font-label-sm text-label-sm text-text-muted truncate">{{ user?.title }}</span>
+        <div class="relative" v-click-outside="() => showUserMenu = false">
+          <button @click="showUserMenu = !showUserMenu"
+            class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted hover:text-text-primary transition-colors"
+            aria-label="Menu akun">
+            <span class="material-symbols-outlined text-lg">more_vert</span>
+          </button>
+          <div v-if="showUserMenu" class="absolute bottom-10 right-0 w-48 bg-surface-base border border-border-subtle rounded-xl shadow-xl z-50 overflow-hidden py-1">
+            <RouterLink to="/admin/pengaturan" @click="showUserMenu = false"
+              class="flex items-center gap-2.5 px-4 py-2.5 font-label-md text-label-md text-text-body hover:bg-surface-container-low cursor-pointer transition-colors">
+              <span class="material-symbols-outlined text-lg text-text-muted">settings</span> Pengaturan Akun
+            </RouterLink>
+            <div class="h-px bg-border-subtle mx-2 my-1"></div>
+            <a @click="handleLogout" class="flex items-center gap-2.5 px-4 py-2.5 font-label-md text-label-md text-status-danger-text hover:bg-status-danger-bg cursor-pointer transition-colors">
+              <span class="material-symbols-outlined text-lg">logout</span> Keluar
+            </a>
+          </div>
         </div>
       </div>
-      <span class="material-symbols-outlined text-text-muted hover:text-text-primary cursor-pointer text-lg">more_vert</span>
     </div>
   </aside>
 </template>
 
 <script setup>
-import { computed, inject } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-defineProps({
-  open: {
-    type: Boolean,
-    default: false,
-  },
-})
+defineProps({ open: { type: Boolean, default: false } })
 const emit = defineEmits(['close'])
 
 const auth = useAuthStore()
@@ -106,11 +123,11 @@ const userInitials = computed(() => {
   if (!user.value?.name) return 'A'
   return user.value.name.split(' ').map(w => w[0]).slice(0, 2).join('')
 })
+const showUserMenu = ref(false)
 
-function navigateAndClose(navigate) {
-  navigate()
-  emit('close')
-}
+function navigateAndClose(navigate) { navigate(); emit('close') }
+
+function handleLogout() { auth.logout(); router.push('/admin/login') }
 
 const navItems = [
   { to: '/admin/dashboard', icon: 'dashboard',    label: 'Dashboard' },
@@ -120,8 +137,11 @@ const navItems = [
   { to: '/admin/pengaduan', icon: 'support_agent', label: 'Pengaduan & Gangguan' },
 ]
 
-function handleLogout() {
-  auth.logout()
-  router.push('/admin/login')
+const vClickOutside = {
+  mounted(el, binding) {
+    el._handler = (e) => { if (!el.contains(e.target)) binding.value(e) }
+    document.addEventListener('click', el._handler)
+  },
+  unmounted(el) { document.removeEventListener('click', el._handler) },
 }
 </script>

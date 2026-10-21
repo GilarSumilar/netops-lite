@@ -9,6 +9,8 @@
       <RouterView />
     </main>
 
+    <!-- Desktop footer (md+) -->
+    <PortalFooter class="hidden md:block" />
     <!-- Mobile bottom tab nav (<md) -->
     <PortalTabNav class="block md:hidden" />
   </div>
@@ -18,4 +20,5 @@
 import PortalTopNav from '@/components/portal/PortalTopNav.vue'
 import PortalHeaderMobile from '@/components/portal/PortalHeaderMobile.vue'
 import PortalTabNav from '@/components/portal/PortalTabNav.vue'
+import PortalFooter from '@/components/portal/PortalFooter.vue'
 </script>

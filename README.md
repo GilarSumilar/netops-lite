@@ -16,91 +16,94 @@ Semua halaman HTML dikonversi ke `.vue`, router dikonfigurasi, layout terpisah a
 
 | View | Route | Status |
 |------|-------|--------|
-| `LoginView.vue` | `/admin/login` | ✅ Done |
-| `DashboardView.vue` | `/admin/dashboard` | ✅ Done |
-| `PelangganView.vue` | `/admin/pelanggan` | ✅ Done |
-| `TagihanView.vue` | `/admin/tagihan` | ✅ Done |
-| `PaketView.vue` | `/admin/paket` | ✅ Done |
-| `PengaduanView.vue` | `/admin/pengaduan` | ✅ Done |
+| `LoginView.vue` | `/admin/login` | ✅ |
+| `DashboardView.vue` | `/admin/dashboard` | ✅ |
+| `PelangganView.vue` | `/admin/pelanggan` | ✅ |
+| `TagihanView.vue` | `/admin/tagihan` | ✅ |
+| `PaketView.vue` | `/admin/paket` | ✅ |
+| `PengaduanView.vue` | `/admin/pengaduan` | ✅ |
+| `PengaturanView.vue` | `/admin/pengaturan` | ✅ |
 
 ### Portal (Pelanggan)
 
 | View | Route | Status |
 |------|-------|--------|
-| `LoginView.vue` | `/portal/login` | ✅ Done |
-| `BerandaView.vue` | `/portal/beranda` | ✅ Done |
-| `TagihanView.vue` | `/portal/tagihan` | ✅ Done |
-| `LayananView.vue` | `/portal/layanan` | ✅ Done |
-| `PengaduanView.vue` | `/portal/pengaduan` | ✅ Done |
-| `ProfilView.vue` | `/portal/profil` | ✅ Done |
-| `SimulasiBayarView.vue` | `/portal/simulasi-bayar` | ✅ Done |
+| `LoginView.vue` | `/portal/login` | ✅ |
+| `BerandaView.vue` | `/portal/beranda` | ✅ |
+| `TagihanView.vue` | `/portal/tagihan` | ✅ |
+| `LayananView.vue` | `/portal/layanan` | ✅ |
+| `PengaduanView.vue` | `/portal/pengaduan` | ✅ |
+| `ProfilView.vue` | `/portal/profil` | ✅ |
+| `SimulasiBayarView.vue` | `/portal/simulasi-bayar` | ✅ |
 
 ### Kuitansi
 
 | View | Route | Status |
 |------|-------|--------|
-| `PratinjauA4View.vue` | `/kuitansi/pratinjau-a4` | ✅ Done |
-| `GridMarginView.vue` | `/kuitansi/grid-margin` | ✅ Done |
-| `HeatmapView.vue` | `/kuitansi/heatmap` | ✅ Done |
-| `OverlayDiffView.vue` | `/kuitansi/overlay-diff` | ✅ Done |
-| `WarnaMononView.vue` | `/kuitansi/warna-monon` | ✅ Done |
+| `PratinjauA4View.vue` | `/kuitansi/pratinjau-a4` | ✅ |
+| `GridMarginView.vue` | `/kuitansi/grid-margin` | ✅ |
+| `HeatmapView.vue` | `/kuitansi/heatmap` | ✅ |
+| `OverlayDiffView.vue` | `/kuitansi/overlay-diff` | ✅ |
+| `WarnaMononView.vue` | `/kuitansi/warna-monon` | ✅ |
 
 ---
 
-## Fase 2 — Action Handlers & Modal ✅
+## Fase 2 — Shared Components, Action Handlers & Modal ✅
 
-Semua tombol yang sebelumnya dummy diberi handler, modal, dan feedback.
+Raw HTML elements diganti komponen bersama. Semua tombol dummy diberi handler, modal, dan feedback reaktif.
+
+### Shared Components (`src/components/`)
+
+| Komponen | Deskripsi |
+|----------|-----------|
+| `AppButton.vue` | variant `primary/secondary/ghost/danger/outline`; size `sm/md/lg`; prop `full`, `to` (RouterLink mode) |
+| `AppInput.vue` | Input dengan label, placeholder, type, error state |
+| `AppSelect.vue` | Select dengan label; slot default untuk `<option>` |
+| `AppModal.vue` | Modal backdrop, `max-width` prop, slot konten |
+| `AppDataTable.vue` | Paginasi, search (internal/external), per-page dropdown, slot `#cell-{key}` custom render, slot `#actions` per baris |
 
 ### Admin
 
 | View | Fitur | Status |
 |------|-------|--------|
-| `DashboardView.vue` | Modal Catat Pembayaran dari dashboard | ✅ Done |
-| `TagihanView.vue` | Tombol "Catat Pembayaran" → modal form pelanggan/jumlah/metode | ✅ Done |
-| `PaketView.vue` | Tombol Tambah → modal form baru; Tombol Edit → modal pre-filled; Tombol Delete → konfirmasi dialog; list reaktif | ✅ Done |
-| `PengaduanView.vue` | Tombol "Tangani" → modal update status + catatan; status berubah reaktif di list | ✅ Done |
+| `AdminHeader.vue` | Notif dropdown + badge + tandai dibaca; search routing; Catat Pembayaran → `/admin/tagihan` | ✅ |
+| `AdminSidebar.vue` | `more_vert` dropdown; Pengaturan → `/admin/pengaturan`; `v-click-outside` | ✅ |
+| `DashboardView.vue` | Modal Catat Pembayaran | ✅ |
+| `PelangganView.vue` | AppDataTable + filter status; modal Detail, Edit (pre-fill + reaktif), Hapus (konfirmasi) | ✅ |
+| `TagihanView.vue` | AppDataTable + filter; modal Detail, Tandai Lunas, Catat Pembayaran; kuitansi → pratinjau-a4 | ✅ |
+| `PaketView.vue` | Tambah/Edit modal; Delete konfirmasi; list reaktif | ✅ |
+| `PengaduanView.vue` | Modal Tangani: update status + catatan; reaktif | ✅ |
+| `PengaturanView.vue` | 4 tab: Profil, Keamanan (ganti sandi + sesi), Notifikasi (toggles), Sistem (info + ISP config + reset modal) | ✅ |
 
 ### Portal
 
 | View | Fitur | Status |
 |------|-------|--------|
-| `TagihanView.vue` | Fix route "Bayar Sekarang" `/portal/simulasi` → `/portal/simulasi-bayar` | ✅ Done |
-| `LayananView.vue` | Modal Upgrade Paket → pilih paket, submit, success feedback, auto-close 2.5s | ✅ Done |
-| `ProfilView.vue` | Modal Edit Profil; Modal Ganti Kata Sandi dengan validasi konfirmasi mismatch | ✅ Done |
-| `SimulasiBayarView.vue` | Flow 3 step: Ringkasan → Instruksi per metode → Selesai + no. referensi | ✅ Done |
-
-### Kuitansi
-
-| View | Fitur | Status |
-|------|-------|--------|
-| `PratinjauA4View.vue` | Fix print blank — ganti selector `body > *:not(#id)` ke `visibility` trick + `print-color-adjust: exact` | ✅ Done |
+| `PortalTopNav.vue` | Logo RouterLink; notif dropdown; avatar dropdown | ✅ |
+| `PortalHeaderMobile.vue` | Logo RouterLink; notif dropdown; avatar → profil | ✅ |
+| `PortalFooter.vue` | Komponen baru: brand, nav links, kontak, bottom bar | ✅ |
+| `PortalLayout.vue` | Render PortalFooter | ✅ |
+| `LayananView.vue` | Modal Upgrade Paket + success feedback | ✅ |
+| `PengaduanView.vue` | Submit tiket baru via modal | ✅ |
+| `ProfilView.vue` | Modal Edit Profil; Modal Ganti Sandi + validasi mismatch | ✅ |
+| `SimulasiBayarView.vue` | Flow 3 step: Ringkasan → Instruksi → Selesai + no. referensi | ✅ |
 
 ---
 
 ## Fase 3 — Integrasi Data & API 🔲
 
-Semua data saat ini dummy/hardcoded. Fase ini menghubungkan ke backend nyata.
-
-### Admin
+Semua data saat ini dummy/hardcoded.
 
 | View | Tugas | Status |
 |------|-------|--------|
-| `DashboardView.vue` | Fetch statistik dari API | 🔲 Todo |
-| `PelangganView.vue` | CRUD pelanggan via API; pagination | 🔲 Todo |
-| `TagihanView.vue` | Fetch tagihan; submit pembayaran ke API | 🔲 Todo |
-| `PaketView.vue` | CRUD paket via API | 🔲 Todo |
-| `PengaduanView.vue` | Fetch tiket; update status via API | 🔲 Todo |
-
-### Portal
-
-| View | Tugas | Status |
-|------|-------|--------|
-| `BerandaView.vue` | Fetch data pelanggan login dari API | 🔲 Todo |
-| `TagihanView.vue` | Fetch tagihan aktif pelanggan | 🔲 Todo |
-| `LayananView.vue` | Submit request upgrade ke API | 🔲 Todo |
-| `PengaduanView.vue` | Submit tiket baru; fetch riwayat tiket | 🔲 Todo |
-| `ProfilView.vue` | Submit edit profil + ganti password via API | 🔲 Todo |
-| `SimulasiBayarView.vue` | Verifikasi pembayaran via payment gateway | 🔲 Todo |
+| `DashboardView.vue` | Fetch statistik dari API | 🔲 |
+| `PelangganView.vue` | CRUD pelanggan via API | 🔲 |
+| `TagihanView.vue` | Fetch tagihan; submit pembayaran | 🔲 |
+| `PaketView.vue` | CRUD paket via API | 🔲 |
+| `PengaduanView.vue` | Fetch + update tiket via API | 🔲 |
+| `PengaturanView.vue` | Simpan profil admin + konfigurasi ISP | 🔲 |
+| Portal — semua view | Fetch data pelanggan login; submit form via API | 🔲 |
+| `SimulasiBayarView.vue` | Verifikasi pembayaran via payment gateway | 🔲 |
 
 ---
 
@@ -108,10 +111,10 @@ Semua data saat ini dummy/hardcoded. Fase ini menghubungkan ke backend nyata.
 
 | Tugas | Status |
 |-------|--------|
-| Implementasi Pinia auth store | 🔲 Todo |
-| Route guard admin (redirect ke `/admin/login` jika belum login) | 🔲 Todo |
-| Route guard portal (redirect ke `/portal/login` jika belum login) | 🔲 Todo |
-| Persistent session (localStorage / token refresh) | 🔲 Todo |
+| Implementasi Pinia auth store | 🔲 |
+| Route guard admin (`/admin/login`) | 🔲 |
+| Route guard portal (`/portal/login`) | 🔲 |
+| Persistent session (localStorage / token refresh) | 🔲 |
 
 ---
 
@@ -119,11 +122,11 @@ Semua data saat ini dummy/hardcoded. Fase ini menghubungkan ke backend nyata.
 
 | Tugas | Status |
 |-------|--------|
-| Loading skeleton state di semua list view | 🔲 Todo |
-| Error boundary + toast notifikasi global | 🔲 Todo |
-| Form validation library (atau Zod) | 🔲 Todo |
-| PWA / offline support | 🔲 Todo |
-| Lighthouse audit (performance, a11y) | 🔲 Todo |
+| Loading skeleton state di semua list view | 🔲 |
+| Error boundary + toast notifikasi global | 🔲 |
+| Form validation (Zod atau VeeValidate) | 🔲 |
+| PWA / offline support | 🔲 |
+| Lighthouse audit (performance, a11y) | 🔲 |
 
 ---
 

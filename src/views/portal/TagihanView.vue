@@ -32,13 +32,13 @@
           <span class="text-text-primary">Total</span><span class="text-primary-container">Rp 250.000</span>
         </div>
       </div>
-      <RouterLink to="/portal/simulasi-bayar" class="h-11 rounded-lg bg-primary-container text-on-primary font-label-lg flex items-center justify-center gap-2 hover:bg-primary transition-all shadow-sm">
+      <AppButton :full="true" size="lg" to="/portal/simulasi-bayar">
         <span class="material-symbols-outlined text-[18px]">payment</span> Bayar Sekarang
-      </RouterLink>
+      </AppButton>
     </div>
     <!-- Histori -->
-    <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm">
-      <h3 class="font-headline-sm text-headline-sm text-text-primary mb-3">Histori Pembayaran</h3>
+    <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-4">
+      <h3 class="font-headline-sm text-headline-sm text-text-primary">Histori Pembayaran</h3>
       <div class="flex flex-col divide-y divide-border-subtle">
         <div v-for="h in histori" :key="h.id" class="flex items-center justify-between py-3">
           <div>
@@ -56,6 +56,7 @@
 </template>
 
 <script setup>
+import AppButton from '@/components/AppButton.vue'
 const histori = [
   { id:1, periode:'September 2024', tanggal:'2 Sep 2024',  metode:'Transfer Bank', nominal:'Rp 250.000' },
   { id:2, periode:'Agustus 2024',   tanggal:'1 Agt 2024',  metode:'QRIS',          nominal:'Rp 250.000' },

@@ -17,9 +17,9 @@
           <span class="font-label-md text-label-md text-text-primary font-semibold">{{ s.value }}</span>
         </div>
       </div>
-      <button @click="showUpgradeModal = true" class="h-10 rounded-lg border border-primary-container text-primary-container font-label-lg flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary transition-all">
+      <AppButton variant="outline-primary" :full="true" @click="showUpgradeModal = true">
         <span class="material-symbols-outlined text-[18px]">upgrade</span> Upgrade Paket
-      </button>
+      </AppButton>
     </div>
     <!-- Network info -->
     <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-3">
@@ -32,41 +32,37 @@
       </div>
     </div>
     <!-- Modal Upgrade Paket -->
-    <div v-if="showUpgradeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm" @click.self="showUpgradeModal = false">
-      <div class="bg-surface-base rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-5 p-6">
-        <div class="flex items-center justify-between">
-          <h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">Upgrade Paket Internet</h3>
-          <button @click="showUpgradeModal = false" class="p-1.5 rounded-lg hover:bg-surface-container-low text-text-muted transition-colors"><span class="material-symbols-outlined text-xl">close</span></button>
-        </div>
-        <p class="font-body-sm text-body-sm text-text-body">Pilih paket yang ingin Anda upgrade. Permintaan akan diteruskan ke admin untuk diproses.</p>
-        <div class="flex flex-col gap-2">
-          <div v-for="p in upgradePakets" :key="p.name"
-            :class="['flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all', selectedPaket === p.name ? 'border-primary-container bg-primary-fixed/30' : 'border-border-default hover:border-border-strong']"
-            @click="selectedPaket = p.name">
-            <div class="flex items-center gap-3">
-              <div :class="['w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0', selectedPaket === p.name ? 'border-primary-container' : 'border-border-default']">
-                <div v-if="selectedPaket === p.name" class="w-2 h-2 rounded-full bg-primary-container"></div>
-              </div>
-              <div>
-                <p class="font-label-md text-label-md text-text-primary">{{ p.name }}</p>
-                <p class="font-body-sm text-body-sm text-text-muted">{{ p.desc }}</p>
-              </div>
+    <AppModal v-model="showUpgradeModal" title="Upgrade Paket Internet">
+      <p class="font-body-sm text-body-sm text-text-body">Pilih paket yang ingin Anda upgrade. Permintaan akan diteruskan ke admin untuk diproses.</p>
+      <div class="flex flex-col gap-2">
+        <div v-for="p in upgradePakets" :key="p.name"
+          :class="['flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all', selectedPaket === p.name ? 'border-primary-container bg-primary-fixed/30' : 'border-border-default hover:border-border-strong']"
+          @click="selectedPaket = p.name">
+          <div class="flex items-center gap-3">
+            <div :class="['w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0', selectedPaket === p.name ? 'border-primary-container' : 'border-border-default']">
+              <div v-if="selectedPaket === p.name" class="w-2 h-2 rounded-full bg-primary-container"></div>
             </div>
-            <span class="font-label-md text-label-md text-primary-container font-semibold shrink-0">{{ p.price }}</span>
+            <div>
+              <p class="font-label-md text-label-md text-text-primary">{{ p.name }}</p>
+              <p class="font-body-sm text-body-sm text-text-muted">{{ p.desc }}</p>
+            </div>
           </div>
+          <span class="font-label-md text-label-md text-primary-container font-semibold shrink-0">{{ p.price }}</span>
         </div>
-        <div class="flex gap-3 pt-1">
-          <button @click="showUpgradeModal = false" class="flex-1 h-10 rounded-lg border border-border-default text-text-body font-label-md hover:bg-surface-container-low transition-colors">Batal</button>
-          <button @click="submitUpgrade" :disabled="!selectedPaket" class="flex-1 h-10 rounded-lg bg-primary-container text-on-primary font-label-md hover:bg-primary transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">Ajukan Upgrade</button>
-        </div>
-        <p v-if="upgradeSubmitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg text-center">Permintaan upgrade dikirim. Admin akan menghubungi Anda.</p>
       </div>
-    </div>
+      <p v-if="upgradeSubmitted" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg text-center">Permintaan upgrade dikirim. Admin akan menghubungi Anda.</p>
+      <div class="flex gap-3 pt-1">
+        <AppButton variant="outline" :full="true" @click="showUpgradeModal = false">Batal</AppButton>
+        <AppButton :full="true" :disabled="!selectedPaket" @click="submitUpgrade">Ajukan Upgrade</AppButton>
+      </div>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import AppButton from '@/components/AppButton.vue'
+import AppModal  from '@/components/AppModal.vue'
 const showUpgradeModal = ref(false)
 const selectedPaket = ref('')
 const upgradeSubmitted = ref(false)
