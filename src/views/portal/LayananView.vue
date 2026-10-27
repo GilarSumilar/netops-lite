@@ -1,15 +1,25 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 md:px-6 py-6 flex flex-col gap-5">
     <h2 class="font-headline-lg text-headline-lg text-text-primary">Layanan Saya</h2>
+    <p v-if="portal.error" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ portal.error }}</p>
+    <div v-if="portal.data && !portal.data.customer" class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-3">
+      <span class="w-fit rounded-full bg-status-warning-bg px-3 py-1 font-label-sm text-status-warning-text">Belum berlangganan</span>
+      <h3 class="font-headline-sm text-text-primary">Pilih paket internet</h3>
+      <div v-for="p in portal.data.paketTersedia" :key="p.id" class="flex items-center justify-between border-t border-border-subtle py-3">
+        <div><p class="font-label-md text-text-primary">{{ p.name }}</p><p class="font-body-sm text-text-muted">{{ p.desc }} · {{ p.speed }}</p></div>
+        <span class="font-label-md text-primary-container">{{ p.price }}</span>
+      </div>
+      <p class="font-body-sm text-text-muted">Hubungi ISP untuk berlangganan dan menautkan paket ke akun Anda.</p>
+    </div>
     <!-- Active package card -->
-    <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-4">
+    <div v-else-if="portal.data?.customer" class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-4">
       <div class="flex items-start justify-between gap-3">
         <div>
           <p class="font-label-md text-label-md text-text-muted">Paket Aktif</p>
-          <h3 class="font-headline-md text-headline-md text-text-primary font-bold mt-0.5">Fiber Pro 50 Mbps</h3>
-          <p class="font-body-sm text-body-sm text-text-body mt-1">Layanan fiber optik untuk keluarga aktif</p>
+          <h3 class="font-headline-md text-headline-md text-text-primary font-bold mt-0.5">{{ portal.data.customer.paket || 'Paket belum ditentukan' }}</h3>
+          <p class="font-body-sm text-body-sm text-text-body mt-1">{{ portal.data.paket?.desc || 'Detail paket belum tersedia.' }}</p>
         </div>
-        <span class="px-2.5 py-1 rounded-full bg-status-success-bg text-status-success-text font-label-sm font-semibold shrink-0">Aktif</span>
+        <span :class="['px-2.5 py-1 rounded-full font-label-sm font-semibold shrink-0', portal.data.customer.status === 'aktif' ? 'bg-status-success-bg text-status-success-text' : 'bg-status-warning-bg text-status-warning-text']">{{ portal.data.customer.status }}</span>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div v-for="s in specs" :key="s.label" class="bg-surface-container-low rounded-lg p-3 flex flex-col gap-1">
@@ -17,12 +27,12 @@
           <span class="font-label-md text-label-md text-text-primary font-semibold">{{ s.value }}</span>
         </div>
       </div>
-      <AppButton variant="outline-primary" :full="true" @click="showUpgradeModal = true">
+      <AppButton v-if="portal.data.paketTersedia.length > 1" variant="outline-primary" :full="true" @click="showUpgradeModal = true">
         <span class="material-symbols-outlined text-[18px]">upgrade</span> Upgrade Paket
       </AppButton>
     </div>
     <!-- Network info -->
-    <div class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-3">
+    <div v-if="portal.data?.customer" class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex flex-col gap-3">
       <h3 class="font-headline-sm text-headline-sm text-text-primary">Informasi Jaringan</h3>
       <div class="flex flex-col divide-y divide-border-subtle">
         <div v-for="info in networkInfo" :key="info.label" class="flex items-center justify-between py-3">
@@ -60,34 +70,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AppButton from '@/components/AppButton.vue'
 import AppModal  from '@/components/AppModal.vue'
+import { usePortalStore } from '@/stores/portal'
+const portal = usePortalStore()
 const showUpgradeModal = ref(false)
 const selectedPaket = ref('')
 const upgradeSubmitted = ref(false)
-const specs = [
-  { label:'Kecepatan Download', value:'50 Mbps' },
-  { label:'Kecepatan Upload',   value:'25 Mbps' },
-  { label:'Latensi',            value:'< 10 ms' },
-  { label:'Harga Bulanan',      value:'Rp 250.000' },
-  { label:'Tipe Koneksi',       value:'Fiber Optik' },
-  { label:'Masa Aktif',         value:'s/d 31 Okt 2024' },
-]
-const networkInfo = [
-  { label:'Alamat IP',      value:'192.168.1.105' },
-  { label:'Node Terdekat',  value:'ODP-RT03-RW01' },
-  { label:'Status ODP',     value:'Online' },
-  { label:'Uptime',         value:'14 hari 6 jam' },
-]
-const upgradePakets = [
-  { name:'Business 100 Mbps', desc:'Koneksi stabil untuk warnet dan UMKM',          price:'Rp 450.000/bln' },
-  { name:'Ultra 200 Mbps',    desc:'Performa tertinggi untuk gaming & 4K streaming', price:'Rp 750.000/bln' },
-]
+const specs = computed(() => [
+  { label:'Kecepatan', value:portal.data?.paket?.speed || '-' },
+  { label:'Harga Bulanan', value:portal.data?.paket?.price || '-' },
+  { label:'Status Layanan', value:portal.data?.customer?.status || '-' },
+])
+const networkInfo = computed(() => [
+  { label:'Alamat Pemasangan', value:portal.data?.customer?.address || '-' },
+  { label:'No. Telepon', value:portal.data?.customer?.phone || '-' },
+  { label:'ID Pelanggan', value:portal.data?.customer?.id || '-' },
+])
+const upgradePakets = computed(() => (portal.data?.paketTersedia || [])
+  .filter(paket => paket.name !== portal.data?.customer?.paket))
+onMounted(() => portal.load())
 function submitUpgrade() {
   // ponytail: mock — swap real API + notify admin
   upgradeSubmitted.value = true
   setTimeout(() => { showUpgradeModal.value = false; upgradeSubmitted.value = false; selectedPaket.value = '' }, 2500)
 }
 </script>
-

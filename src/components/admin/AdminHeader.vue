@@ -63,7 +63,7 @@
       </div>
 
       <!-- Catat Pembayaran -->
-      <button @click="$router.push('/admin/tagihan')"
+      <button v-if="auth.isAdmin" @click="$router.push('/admin/tagihan')"
         class="inline-flex h-10 w-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-primary-container text-on-primary shadow-sm transition-all hover:bg-primary sm:w-auto sm:px-space-md"
         type="button" aria-label="Catat Pembayaran">
         <span class="material-symbols-outlined text-lg">add</span>
@@ -76,11 +76,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { formatDate } from '@/composables/useUtils.js'
 
 defineEmits(['toggle-sidebar'])
 
 const router = useRouter()
+const auth = useAuthStore()
 const search = ref('')
 const today = formatDate(new Date())
 const showNotif = ref(false)
@@ -107,4 +109,3 @@ const vClickOutside = {
   unmounted(el) { document.removeEventListener('click', el._handler) },
 }
 </script>
-

@@ -21,7 +21,7 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[18px] pointer-events-none">badge</span>
               <input v-model="form.identifier" id="portal-id" type="text" autocomplete="username"
-                placeholder="CUST-2024-XXX atau email@domain.com" required
+                placeholder="CUST-001 atau email@domain.com" required
                 class="w-full h-10 pl-10 pr-3.5 rounded-lg bg-surface-container-lowest border border-border-default text-text-primary font-body-md placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all" />
             </div>
           </div>
@@ -51,6 +51,9 @@
             <span>{{ demoFilled ? 'Siap masuk' : 'Demo Pelanggan' }}</span>
           </button>
           <p class="font-body-sm text-body-sm text-text-muted text-center">
+            Belum punya akun? <RouterLink to="/portal/register" class="text-primary-container hover:underline font-semibold">Daftar sekarang</RouterLink>
+          </p>
+          <p class="font-body-sm text-body-sm text-text-muted text-center">
             Masalah akses? <a class="text-primary-container hover:underline cursor-pointer">Hubungi ISP</a>
           </p>
         </div>
@@ -67,15 +70,21 @@ const auth = useAuthStore(), router = useRouter()
 const form = reactive({ identifier: '', password: '' })
 const loading = ref(false), errorMsg = ref(''), showPass = ref(false), demoFilled = ref(false)
 function fillDemo() {
-  form.identifier = 'CUST-2024-035'; form.password = 'pelanggan123'
+  form.identifier = 'agus@example.com'; form.password = 'pelanggan123'
   demoFilled.value = true; setTimeout(() => { demoFilled.value = false }, 2500)
 }
 async function handleSubmit() {
   if (!form.identifier || !form.password) return
   errorMsg.value = ''; loading.value = true
-  await new Promise(r => setTimeout(r, 1000))
-  loading.value = false
-  auth.loginCustomer({ identifier: form.identifier })
-  router.push('/portal/beranda')
+  try {
+    await auth.loginCustomer({ identifier: form.identifier, password: form.password })
+    router.push(typeof router.currentRoute.value.query.redirect === 'string'
+      ? router.currentRoute.value.query.redirect
+      : '/portal/beranda')
+  } catch (error) {
+    errorMsg.value = error.message
+  } finally {
+    loading.value = false
+  }
 }
 </script>

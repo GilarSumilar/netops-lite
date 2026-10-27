@@ -22,7 +22,7 @@
           <p class="font-body-sm text-body-sm text-text-muted">{{ profil.jabatan }}</p>
         </div>
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-status-success-bg text-status-success-text font-label-sm font-semibold">
-          <span class="w-1.5 h-1.5 rounded-full bg-status-success-text"></span> Admin Aktif
+          <span class="w-1.5 h-1.5 rounded-full bg-status-success-text"></span> {{ roleLabel }} Aktif
         </span>
       </div>
       <div class="lg:col-span-2 bg-surface-base rounded-xl border border-border-subtle p-6 shadow-sm flex flex-col gap-5">
@@ -51,8 +51,8 @@
         </div>
         <p v-if="pass.baru && pass.konfirmasi && pass.baru !== pass.konfirmasi" class="font-body-sm text-body-sm text-status-danger-text bg-status-danger-bg px-3 py-2 rounded-lg">Konfirmasi kata sandi tidak cocok.</p>
         <p v-if="passSaved" class="font-body-sm text-body-sm text-status-success-text bg-status-success-bg px-3 py-2 rounded-lg">Kata sandi berhasil diubah.</p>
-        <div class="flex justify-end">
-        </div>
+        <p v-if="passError" role="alert" class="font-body-sm text-body-sm text-status-danger-text bg-status-danger-bg px-3 py-2 rounded-lg">{{ passError }}</p>
+        <div class="flex justify-end"><AppButton @click="savePass">Simpan Kata Sandi</AppButton></div>
       </div>
       <div class="bg-surface-base rounded-xl border border-border-subtle p-6 shadow-sm flex flex-col gap-4">
         <h2 class="font-headline-sm text-headline-sm text-text-primary font-bold">Sesi Aktif</h2>
@@ -149,6 +149,7 @@ import AppInput  from '@/components/AppInput.vue'
 import AppModal  from '@/components/AppModal.vue'
 import { useAuthStore } from '@/stores/auth'
 const auth = useAuthStore()
+const roleLabel = computed(() => auth.user?.role === 'teknisi' ? 'Teknisi' : 'Admin')
 const activeTab = ref('profil')
 const tabs = [
   { id:'profil',     label:'Profil' },
@@ -171,10 +172,21 @@ function saveProfil() {
 }
 const pass = reactive({ lama:'', baru:'', konfirmasi:'' })
 const passSaved = ref(false)
-function savePass() {
-  // ponytail: mock - swap real API
-  passSaved.value = true; Object.assign(pass, { lama:'', baru:'', konfirmasi:'' })
-  setTimeout(() => passSaved.value = false, 2000)
+const passError = ref('')
+async function savePass() {
+  if (!pass.lama || pass.baru.length < 8 || pass.baru !== pass.konfirmasi) {
+    passError.value = 'Isi kata sandi saat ini, gunakan minimal 8 karakter, dan pastikan konfirmasi sama.'
+    return
+  }
+  try {
+    passError.value = ''
+    await auth.changePassword({ currentPassword: pass.lama, newPassword: pass.baru })
+    passSaved.value = true
+    Object.assign(pass, { lama:'', baru:'', konfirmasi:'' })
+    setTimeout(() => passSaved.value = false, 2000)
+  } catch (error) {
+    passError.value = error.message
+  }
 }
 const sesi = ref([
   { id:1, icon:'computer',   device:'Chrome - Windows 11', lokasi:'Jakarta',  waktu:'Aktif sekarang', current:true  },
@@ -192,8 +204,8 @@ const notifSaved = ref(false)
 function saveNotif() { notifSaved.value = true; setTimeout(() => notifSaved.value = false, 2000) }
 const sysInfo = [
   { label:'Versi Aplikasi',  value:'NetOps Lite v1.0.0' },
-  { label:'Environment',     value:'Production' },
-  { label:'Database',        value:'PostgreSQL 15' },
+  { label:'Environment',     value:'Prototype lokal' },
+  { label:'Database',        value:'File JSON lokal' },
   { label:'Terakhir Backup', value:'Hari ini, 03.00 WIB' },
   { label:'Total Pelanggan', value:'128 akun' },
   { label:'Uptime Server',   value:'99.8% (30 hari)' },

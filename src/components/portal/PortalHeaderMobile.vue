@@ -15,9 +15,11 @@
         </div>
       </RouterLink>
       <div class="flex items-center gap-space-sm shrink-0">
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-success-bg">
-          <span class="w-1.5 h-1.5 rounded-full bg-status-success-text animate-pulse"></span>
-          <span class="font-label-sm text-label-sm text-status-success-text font-semibold">Aktif</span>
+        <div :class="['inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full', hasSubscription ? 'bg-status-success-bg' : 'bg-status-warning-bg']">
+          <span class="w-1.5 h-1.5 rounded-full" :class="hasSubscription ? 'bg-status-success-text' : 'bg-status-warning-text'"></span>
+          <span :class="['font-label-sm text-label-sm font-semibold', hasSubscription ? 'text-status-success-text' : 'text-status-warning-text']">
+            {{ hasSubscription ? 'Berlangganan' : 'Belum berlangganan' }}
+          </span>
         </div>
         <!-- Notifikasi -->
         <div class="relative" v-click-outside="() => showNotif = false">
@@ -48,6 +50,9 @@
           class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md font-bold ring-2 ring-primary-fixed">
           {{ initials }}
         </RouterLink>
+        <button @click="handleLogout" class="flex h-9 w-9 items-center justify-center rounded-lg text-status-danger-text hover:bg-status-danger-bg" aria-label="Keluar">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
       </div>
     </div>
   </header>
@@ -56,10 +61,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const route = useRoute()
+const router = useRouter()
+const hasSubscription = computed(() => !!auth.user?.customerId)
 const initials = computed(() => auth.user?.initials || 'U')
 const showNotif = ref(false)
 const notifs = ref([
@@ -74,6 +82,15 @@ const pageTitle = computed(() => ({
   'portal-profil':    'Profil Saya',
   'portal-simulasi':  'Simulasi Pembayaran',
 }[route.name] || 'Portal Pelanggan'))
+async function handleLogout() {
+  try {
+    await auth.logout()
+  } catch (error) {
+    window.alert(`Sesi lokal ditutup, tetapi sesi server gagal diakhiri: ${error.message}`)
+  } finally {
+    router.push('/portal/login')
+  }
+}
 
 const vClickOutside = {
   mounted(el, binding) {
@@ -83,4 +100,3 @@ const vClickOutside = {
   unmounted(el) { document.removeEventListener('click', el._handler) },
 }
 </script>
-

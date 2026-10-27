@@ -1,6 +1,11 @@
 <template>
   <div class="flex flex-col gap-1.5">
-    <label v-if="label" :for="id" class="font-label-md text-label-md text-text-primary">{{ label }}</label>
+    <label
+      v-if="label"
+      :for="id"
+      class="font-label-md text-label-md text-text-primary"
+      >{{ label }}</label
+    >
     <input
       :id="id"
       :type="type"
@@ -15,12 +20,12 @@
 
 <script setup>
 defineProps({
-  modelValue: { type: String, default: '' },
-  label:       { type: String, default: '' },
-  id:          { type: String, default: '' },
-  type:        { type: String, default: 'text' },
-  placeholder: { type: String, default: '' },
-  disabled:    { type: Boolean, default: false },
-})
-defineEmits(['update:modelValue'])
+  modelValue: { type: String, default: "" },
+  label: { type: String, default: "" },
+  id: { type: String, default: "" },
+  type: { type: String, default: "text" },
+  placeholder: { type: String, default: "" },
+  disabled: { type: Boolean, default: false },
+});
+defineEmits(["update:modelValue"]);
 </script>

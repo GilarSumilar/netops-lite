@@ -56,7 +56,15 @@
         <span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted font-bold">Sistem</span>
       </div>
       <nav class="flex flex-col gap-space-xs px-space-sm">
-        <RouterLink to="/admin/pengaturan" custom v-slot="{ isActive, navigate }">
+        <RouterLink v-if="auth.isAdmin" to="/admin/akun" custom v-slot="{ isActive, navigate }">
+          <a @click="navigateAndClose(navigate)"
+            :class="['flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg transition-colors cursor-pointer',
+              isActive ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-text-body hover:bg-surface-container-low hover:text-text-primary']">
+            <span class="material-symbols-outlined text-xl">manage_accounts</span>
+            <span>Akun &amp; Role</span>
+          </a>
+        </RouterLink>
+        <RouterLink v-if="auth.isAdmin" to="/admin/pengaturan" custom v-slot="{ isActive, navigate }">
           <a @click="navigateAndClose(navigate)"
             :class="['flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg font-label-lg text-label-lg transition-colors cursor-pointer',
               isActive ? 'bg-primary-container text-on-primary font-bold shadow-sm' : 'text-text-body hover:bg-surface-container-low hover:text-text-primary']">
@@ -83,7 +91,7 @@
           </div>
           <div class="flex flex-col min-w-0">
             <span class="font-label-md text-label-md text-text-primary truncate font-bold">{{ user?.name }}</span>
-            <span class="font-label-sm text-label-sm text-text-muted truncate">{{ user?.title }}</span>
+            <span class="font-label-sm text-label-sm text-text-muted truncate">{{ roleLabel[user?.role] }}</span>
           </div>
         </div>
         <div class="relative" v-click-outside="() => showUserMenu = false">
@@ -127,15 +135,25 @@ const showUserMenu = ref(false)
 
 function navigateAndClose(navigate) { navigate(); emit('close') }
 
-function handleLogout() { auth.logout(); router.push('/admin/login') }
+async function handleLogout() {
+  try {
+    await auth.logout()
+  } catch (error) {
+    window.alert(`Sesi lokal ditutup, tetapi sesi server gagal diakhiri: ${error.message}`)
+  } finally {
+    router.push('/admin/login')
+  }
+}
 
-const navItems = [
-  { to: '/admin/dashboard', icon: 'dashboard',    label: 'Dashboard' },
-  { to: '/admin/pelanggan', icon: 'group',         label: 'Pelanggan' },
-  { to: '/admin/paket',     icon: 'wifi',          label: 'Paket Internet' },
-  { to: '/admin/tagihan',   icon: 'receipt_long',  label: 'Tagihan & Pembayaran' },
-  { to: '/admin/pengaduan', icon: 'support_agent', label: 'Pengaduan & Gangguan' },
-]
+const roleLabel = { admin: 'Admin', teknisi: 'Teknisi' }
+const navItems = computed(() => [
+  { to: '/admin/dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { to: '/admin/pelanggan', icon: 'group', label: 'Pelanggan', roles: ['admin', 'teknisi'] },
+  { to: '/admin/paket', icon: 'wifi', label: 'Paket Internet', roles: ['admin'] },
+  { to: '/admin/tagihan', icon: 'receipt_long', label: 'Tagihan & Pembayaran', roles: ['admin'] },
+  { to: '/admin/pengaduan', icon: 'support_agent', label: 'Pengaduan & Gangguan', roles: ['admin', 'teknisi'] },
+  { to: '/admin/router', icon: 'router', label: 'Router MikroTik', roles: ['admin', 'teknisi'] },
+].filter(item => !item.roles || item.roles.includes(auth.user?.role)))
 
 const vClickOutside = {
   mounted(el, binding) {

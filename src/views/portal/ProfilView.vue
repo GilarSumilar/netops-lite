@@ -3,6 +3,7 @@
     <h2 class="font-headline-lg text-headline-lg text-text-primary">
       Profil Saya
     </h2>
+    <p v-if="portal.error" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ portal.error }}</p>
     <!-- Avatar + name -->
     <div
       class="bg-surface-base rounded-xl border border-border-subtle p-5 shadow-sm flex items-center gap-4"
@@ -20,10 +21,10 @@
         </h3>
         <p class="font-body-sm text-body-sm text-text-muted">{{ user?.id }}</p>
         <span
-          class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-status-success-bg text-status-success-text font-label-sm font-semibold"
+          :class="['mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-sm font-semibold', hasSubscription ? 'bg-status-success-bg text-status-success-text' : 'bg-status-warning-bg text-status-warning-text']"
         >
-          <span class="w-1.5 h-1.5 rounded-full bg-status-success-text"></span>
-          Pelanggan Aktif
+          <span class="w-1.5 h-1.5 rounded-full" :class="hasSubscription ? 'bg-status-success-text' : 'bg-status-warning-text'"></span>
+          {{ hasSubscription ? `Berlangganan · ${portal.data?.customer?.status}` : 'Belum berlangganan' }}
         </span>
       </div>
     </div>
@@ -83,6 +84,7 @@
       >
         Profil berhasil diperbarui.
       </p>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3">
         <AppButton variant="outline" :full="true" @click="showEditModal = false"
           >Batal</AppButton
@@ -115,6 +117,7 @@
       >
         Kata sandi berhasil diubah.
       </p>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <p
         v-if="
           passForm.baru &&
@@ -139,63 +142,82 @@
 </template>
 
 <script setup>
-import { computed, ref, reactive } from "vue";
+import { computed, ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import AppButton from "@/components/AppButton.vue";
 import AppInput from "@/components/AppInput.vue";
 import AppModal from "@/components/AppModal.vue";
+import { usePortalStore } from "@/stores/portal";
 const auth = useAuthStore(),
   router = useRouter();
+const portal = usePortalStore();
 const user = computed(() => auth.user);
+const hasSubscription = computed(() => !!portal.data?.customer);
 const showEditModal = ref(false);
 const showPasswordModal = ref(false);
 const editForm = reactive({ name: "", phone: "", email: "", address: "" });
 const passForm = reactive({ lama: "", baru: "", konfirmasi: "" });
 const editSubmitted = ref(false);
 const passSubmitted = ref(false);
-const fields = [
-  { label: "Nama Lengkap", icon: "person", value: "Bpk. Agus Setiawan" },
-  { label: "ID Pelanggan", icon: "badge", value: "CUST-2024-035" },
-  { label: "Paket Aktif", icon: "wifi", value: "Fiber Pro 50 Mbps" },
-  { label: "Alamat", icon: "home", value: "Jl. Melati No. 12, RT 03/RW 01" },
-  { label: "No. Telepon", icon: "phone", value: "+62 812-3456-7890" },
-  { label: "Email", icon: "alternate_email", value: "agus.setiawan@email.com" },
-  {
-    label: "Bergabung Sejak",
-    icon: "calendar_month",
-    value: "15 Januari 2023",
-  },
-];
-function handleLogout() {
-  auth.logout();
-  router.push("/portal/login");
+const errorMsg = ref("");
+const fields = computed(() => [
+  { label: "Nama Lengkap", icon: "person", value: user.value?.name || "-" },
+  { label: "ID Pelanggan", icon: "badge", value: portal.data?.customer?.id || "Belum ditautkan" },
+  { label: "Paket Aktif", icon: "wifi", value: portal.data?.customer?.paket || "Belum berlangganan" },
+  { label: "Alamat", icon: "home", value: portal.data?.customer?.address || user.value?.address || "-" },
+  { label: "No. Telepon", icon: "phone", value: portal.data?.customer?.phone || user.value?.phone || "-" },
+  { label: "Email", icon: "alternate_email", value: user.value?.email || "-" },
+]);
+onMounted(() => portal.load());
+async function handleLogout() {
+  try {
+    await auth.logout()
+  } catch (error) {
+    window.alert(`Sesi lokal ditutup, tetapi sesi server gagal diakhiri: ${error.message}`)
+  } finally {
+    router.push('/portal/login')
+  }
 }
 function openEdit() {
   editForm.name = user.value?.name || "";
-  editForm.phone = "+62 812-3456-7890";
-  editForm.email = "agus.setiawan@email.com";
-  editForm.address = "Jl. Melati No. 12, RT 03/RW 01";
+  editForm.phone = user.value?.phone || "";
+  editForm.email = user.value?.email || "";
+  editForm.address = user.value?.address || "";
   showEditModal.value = true;
 }
-function submitEdit() {
-  // ponytail: mock — swap real API + update auth store
-  editSubmitted.value = true;
-  setTimeout(() => {
-    showEditModal.value = false;
-    editSubmitted.value = false;
-  }, 1500);
+async function submitEdit() {
+  try {
+    errorMsg.value = "";
+    const result = await portal.updateProfile(editForm);
+    auth.user = result.user;
+    editSubmitted.value = true;
+    setTimeout(() => {
+      showEditModal.value = false;
+      editSubmitted.value = false;
+    }, 1500);
+  } catch (error) {
+    errorMsg.value = `Gagal menyimpan profil: ${error.message}`;
+  }
 }
-function submitPassword() {
-  if (!passForm.lama || passForm.baru !== passForm.konfirmasi) return;
-  // ponytail: mock — swap real API
-  passSubmitted.value = true;
-  setTimeout(() => {
-    showPasswordModal.value = false;
-    passSubmitted.value = false;
-    passForm.lama = "";
-    passForm.baru = "";
-    passForm.konfirmasi = "";
-  }, 1500);
+async function submitPassword() {
+  if (!passForm.lama || passForm.baru.length < 8 || passForm.baru !== passForm.konfirmasi) {
+    errorMsg.value = "Periksa kata sandi saat ini dan pastikan kata sandi baru minimal 8 karakter serta cocok.";
+    return;
+  }
+  try {
+    errorMsg.value = "";
+    await auth.changePassword({ currentPassword: passForm.lama, newPassword: passForm.baru });
+    passSubmitted.value = true;
+    setTimeout(() => {
+      showPasswordModal.value = false;
+      passSubmitted.value = false;
+      passForm.lama = "";
+      passForm.baru = "";
+      passForm.konfirmasi = "";
+    }, 1500);
+  } catch (error) {
+    errorMsg.value = `Gagal mengganti kata sandi: ${error.message}`;
+  }
 }
 </script>

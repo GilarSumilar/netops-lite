@@ -20,7 +20,7 @@
           <span class="material-symbols-outlined text-primary-container text-[18px] mt-0.5 shrink-0">verified_user</span>
           <div>
             <p class="font-label-sm text-label-sm text-text-primary font-semibold">Hak Akses Terproteksi</p>
-            <p class="font-body-sm text-body-sm text-secondary text-[11px] leading-tight mt-0.5">Pastikan Anda memiliki izin akses <b>Super Admin</b> atau <b>NOC Operator</b> aktif.</p>
+            <p class="font-body-sm text-body-sm text-secondary text-[11px] leading-tight mt-0.5">Masuk dengan akun <b>Admin</b> atau <b>Teknisi</b> yang aktif.</p>
           </div>
         </div>
         <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
@@ -61,9 +61,14 @@
             <span class="material-symbols-outlined text-[16px]">{{ demoFilled ? 'check_circle' : 'touch_app' }}</span>
             <span>{{ demoFilled ? 'Kredensial Siap' : 'Demo Otomatis' }}</span>
           </button>
+          <button @click="fillTechnician" type="button"
+            class="flex items-center gap-1.5 rounded-lg border border-border-default px-4 py-2 font-label-md text-text-body transition-all hover:bg-surface-container-low">
+            <span class="material-symbols-outlined text-[16px]">engineering</span>
+            Demo Teknisi
+          </button>
           <div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-status-success-bg text-status-success-text font-label-sm font-semibold">
             <span class="w-1.5 h-1.5 rounded-full bg-status-success-text animate-pulse"></span>
-            <span>Enkripsi TLS 1.3 Aktif</span>
+            <span>Sesi login terproteksi</span>
           </div>
         </div>
       </div>
@@ -91,13 +96,25 @@ function fillDemo() {
   setTimeout(() => { demoFilled.value = false }, 2500)
 }
 
+function fillTechnician() {
+  form.email = 'dani.pratama@netops.id'
+  form.password = 'TeknisiDemo#2025'
+  demoFilled.value = false
+}
+
 async function handleSubmit() {
   if (!form.email || !form.password) return
   errorMsg.value = ''
   loading.value  = true
-  await new Promise(r => setTimeout(r, 1200)) // ponytail: mock — swap real API
-  loading.value  = false
-  auth.loginAdmin({ email: form.email })
-  router.push('/admin/dashboard')
+  try {
+    await auth.loginAdmin({ email: form.email, password: form.password })
+    router.push(typeof router.currentRoute.value.query.redirect === 'string'
+      ? router.currentRoute.value.query.redirect
+      : '/admin/dashboard')
+  } catch (error) {
+    errorMsg.value = error.message
+  } finally {
+    loading.value = false
+  }
 }
 </script>

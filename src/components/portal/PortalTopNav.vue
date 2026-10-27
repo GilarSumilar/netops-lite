@@ -56,16 +56,11 @@
 
       <!-- Right -->
       <div class="flex items-center gap-space-sm">
-        <div
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-success-bg"
-        >
-          <span
-            class="w-1.5 h-1.5 rounded-full bg-status-success-text animate-pulse"
-          ></span>
-          <span
-            class="font-label-sm text-label-sm text-status-success-text font-semibold"
-            >Aktif</span
-          >
+        <div :class="['inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full', hasSubscription ? 'bg-status-success-bg' : 'bg-status-warning-bg']">
+          <span class="w-1.5 h-1.5 rounded-full" :class="hasSubscription ? 'bg-status-success-text' : 'bg-status-warning-text'"></span>
+          <span :class="['font-label-sm text-label-sm font-semibold', hasSubscription ? 'text-status-success-text' : 'text-status-warning-text']">
+            {{ hasSubscription ? `Berlangganan · ${user?.subscriptionStatus}` : 'Belum berlangganan' }}
+          </span>
         </div>
 
         <!-- Notifikasi -->
@@ -191,6 +186,7 @@ import { useAuthStore } from "@/stores/auth";
 const auth = useAuthStore();
 const router = useRouter();
 const user = computed(() => auth.user);
+const hasSubscription = computed(() => !!user.value?.customerId);
 const initials = computed(() => user.value?.initials || "U");
 const showNotif = ref(false);
 const showUserMenu = ref(false);
@@ -217,9 +213,14 @@ const navItems = [
   { to: "/portal/profil", label: "Profil Saya" },
 ];
 
-function handleLogout() {
-  auth.logout();
-  router.push("/portal/login");
+async function handleLogout() {
+  try {
+    await auth.logout()
+  } catch (error) {
+    window.alert(`Sesi lokal ditutup, tetapi sesi server gagal diakhiri: ${error.message}`)
+  } finally {
+    router.push('/portal/login')
+  }
 }
 
 const vClickOutside = {

@@ -1,0 +1,407 @@
+{
+  "pelanggan": [
+    {
+      "id": "CUST-001",
+      "name": "Bpk. Agus Setiawan",
+      "initials": "AS",
+      "address": "Jl. Melati No. 12",
+      "paket": "Fiber Pro 50 Mbps",
+      "status": "aktif",
+      "tagihan": 0,
+      "phone": "+62 812-0001-0001",
+      "email": "agus@example.com"
+    },
+    {
+      "id": "CUST-002",
+      "name": "Ibu Sari Dewi",
+      "initials": "SD",
+      "address": "Griya Asri Blok C-07",
+      "paket": "Home Basic 20 Mbps",
+      "status": "aktif",
+      "tagihan": 150000,
+      "phone": "+62 812-0002-0002",
+      "email": "sari@example.com"
+    },
+    {
+      "id": "CUST-003",
+      "name": "Ahmad Fauzi",
+      "initials": "AF",
+      "address": "Perum Anggrek Mas B-15",
+      "paket": "Fiber Pro 50 Mbps",
+      "status": "suspend",
+      "tagihan": 300000,
+      "phone": "+62 812-0003-0003",
+      "email": "ahmad@example.com"
+    },
+    {
+      "id": "CUST-004",
+      "name": "Bpk. Hendra Kurniawan",
+      "initials": "HK",
+      "address": "Jl. Kenanga Indah No. 8",
+      "paket": "Business 100 Mbps",
+      "status": "aktif",
+      "tagihan": 0,
+      "phone": "+62 812-0004-0004",
+      "email": "hendra@example.com"
+    },
+    {
+      "id": "CUST-005",
+      "name": "Ibu Ratna Sari",
+      "initials": "RS",
+      "address": "Taman Bunga Blok A No.3",
+      "paket": "Home Basic 20 Mbps",
+      "status": "isolir",
+      "tagihan": 450000,
+      "phone": "+62 812-0005-0005",
+      "email": "ratna@example.com"
+    },
+    {
+      "id": "CUST-006",
+      "name": "Bpk. Doni Pratama",
+      "initials": "DP",
+      "address": "Jl. Mawar No. 5",
+      "paket": "Ultra 200 Mbps",
+      "status": "aktif",
+      "tagihan": 0,
+      "phone": "+62 812-0006-0006",
+      "email": "doni@example.com"
+    },
+    {
+      "id": "CUST-007",
+      "name": "Ibu Lestari",
+      "initials": "IL",
+      "address": "Perum Cendana No. 11",
+      "paket": "Home Basic 20 Mbps",
+      "status": "isolir",
+      "tagihan": 75000,
+      "phone": "+62 812-0007-0007",
+      "email": "lestari@example.com"
+    },
+    {
+      "id": "CUST-008",
+      "name": "Bpk. Wahyu Saputra",
+      "initials": "WS",
+      "address": "Jl. Flamboyan No. 3",
+      "paket": "Fiber Pro 50 Mbps",
+      "status": "suspend",
+      "tagihan": 500000,
+      "phone": "+62 812-0008-0008",
+      "email": "wahyu@example.com"
+    },
+    {
+      "id": "CUST-009",
+      "name": "Ibu Mega Wulandari",
+      "initials": "MW",
+      "address": "Griya Indah Blok D-02",
+      "paket": "Business 100 Mbps",
+      "status": "aktif",
+      "tagihan": 0,
+      "phone": "+62 812-0009-0009",
+      "email": "mega@example.com"
+    },
+    {
+      "id": "CUST-010",
+      "name": "Ahmad Rizky",
+      "initials": "AR",
+      "address": "Jl. Anggrek No. 7",
+      "paket": "Home Basic 20 Mbps",
+      "status": "isolir",
+      "tagihan": 300000,
+      "phone": "+62 812-0010-0010",
+      "email": "rizky@example.com"
+    },
+    {
+      "id": "CUST-011",
+      "name": "Bpk. Fajar Nugroho",
+      "initials": "FN",
+      "address": "Perum Sejahtera A-5",
+      "paket": "Fiber Pro 50 Mbps",
+      "status": "aktif",
+      "tagihan": 0,
+      "phone": "+62 812-0011-0011",
+      "email": "fajar@example.com"
+    },
+    {
+      "id": "CUST-012",
+      "name": "Ibu Yanti Kusuma",
+      "initials": "YK",
+      "address": "Jl. Dahlia No. 9",
+      "paket": "Ultra 200 Mbps",
+      "status": "aktif",
+      "tagihan": 0,
+      "phone": "+62 812-0012-0012",
+      "email": "yanti@example.com"
+    },
+    {
+      "id": "CUST-013",
+      "name": "Bpk. Andi Prasetyo",
+      "initials": "BA",
+      "address": "Perum Griya Asri Blok B-3",
+      "paket": "Home Basic 20 Mbps",
+      "status": "suspend",
+      "tagihan": 0,
+      "phone": "+62 812-0013-0013",
+      "email": "andi@example.com"
+    }
+  ],
+  "paket": [
+    {
+      "id": 1,
+      "name": "Home Basic 20 Mbps",
+      "desc": "Cocok untuk browsing dan streaming SD",
+      "speed": "20 Mbps",
+      "price": "Rp 150.000/bln",
+      "subscribers": 423,
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Fiber Pro 50 Mbps",
+      "desc": "Ideal untuk keluarga aktif streaming HD",
+      "speed": "50 Mbps",
+      "price": "Rp 250.000/bln",
+      "subscribers": 612,
+      "active": true
+    },
+    {
+      "id": 3,
+      "name": "Business 100 Mbps",
+      "desc": "Koneksi stabil untuk warnet dan UMKM",
+      "speed": "100 Mbps",
+      "price": "Rp 450.000/bln",
+      "subscribers": 187,
+      "active": true
+    },
+    {
+      "id": 4,
+      "name": "Ultra 200 Mbps",
+      "desc": "Performa tertinggi untuk gaming streaming",
+      "speed": "200 Mbps",
+      "price": "Rp 750.000/bln",
+      "subscribers": 62,
+      "active": true
+    },
+    {
+      "id": 5,
+      "name": "Starter 10 Mbps",
+      "desc": "Paket hemat untuk penggunaan ringan",
+      "speed": "10 Mbps",
+      "price": "Rp 99.000/bln",
+      "subscribers": 0,
+      "active": false
+    }
+  ],
+  "tagihan": [
+    {
+      "id": "INV-2024-1001",
+      "nama": "Bpk. Agus Setiawan",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 250.000",
+      "status": "lunas",
+      "metode": "Transfer Bank",
+      "tglBayar": "2 Okt 2024",
+      "pelangganId": "CUST-001"
+    },
+    {
+      "id": "INV-2024-1002",
+      "nama": "Ibu Sari Dewi",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 150.000",
+      "status": "belum",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-002"
+    },
+    {
+      "id": "INV-2024-1003",
+      "nama": "Ahmad Fauzi",
+      "periode": "September 2024",
+      "nominal": "Rp 250.000",
+      "status": "terlambat",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-003"
+    },
+    {
+      "id": "INV-2024-1004",
+      "nama": "Bpk. Hendra Kurniawan",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 450.000",
+      "status": "lunas",
+      "metode": "QRIS",
+      "tglBayar": "5 Okt 2024",
+      "pelangganId": "CUST-004"
+    },
+    {
+      "id": "INV-2024-1005",
+      "nama": "Ibu Ratna Sari",
+      "periode": "Agustus 2024",
+      "nominal": "Rp 150.000",
+      "status": "terlambat",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-005"
+    },
+    {
+      "id": "INV-2024-1006",
+      "nama": "Bpk. Doni Pratama",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 750.000",
+      "status": "lunas",
+      "metode": "Transfer Bank",
+      "tglBayar": "1 Okt 2024",
+      "pelangganId": "CUST-006"
+    },
+    {
+      "id": "INV-2024-1007",
+      "nama": "Ibu Lestari",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 150.000",
+      "status": "belum",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-007"
+    },
+    {
+      "id": "INV-2024-1008",
+      "nama": "Bpk. Wahyu Saputra",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 250.000",
+      "status": "terlambat",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-008"
+    },
+    {
+      "id": "INV-2024-1009",
+      "nama": "Ibu Mega Wulandari",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 450.000",
+      "status": "lunas",
+      "metode": "Virtual Account",
+      "tglBayar": "3 Okt 2024",
+      "pelangganId": "CUST-009"
+    },
+    {
+      "id": "INV-2024-1010",
+      "nama": "Ahmad Rizky",
+      "periode": "September 2024",
+      "nominal": "Rp 150.000",
+      "status": "terlambat",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-010"
+    },
+    {
+      "id": "INV-2024-1011",
+      "nama": "Bpk. Fajar Nugroho",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 250.000",
+      "status": "lunas",
+      "metode": "Tunai",
+      "tglBayar": "4 Okt 2024",
+      "pelangganId": "CUST-011"
+    },
+    {
+      "id": "INV-2024-1012",
+      "nama": "Ibu Yanti Kusuma",
+      "periode": "Oktober 2024",
+      "nominal": "Rp 750.000",
+      "status": "belum",
+      "metode": "-",
+      "tglBayar": "",
+      "pelangganId": "CUST-012"
+    }
+  ],
+  "pengaduan": [
+    {
+      "id": "TKT-001",
+      "judul": "Koneksi lambat sejak kemarin malam",
+      "desc": "Kecepatan download hanya 2 Mbps dari paket 50 Mbps",
+      "pelanggan": "Ibu Sari Dewi",
+      "waktu": "23 mnt lalu",
+      "prioritas": "mendesak",
+      "status": "baru",
+      "iconName": "speed",
+      "catatan": "",
+      "pelangganId": "CUST-002"
+    },
+    {
+      "id": "TKT-002",
+      "judul": "Internet mati total sejak pagi",
+      "desc": "Router menyala tapi tidak ada koneksi ke luar",
+      "pelanggan": "Ahmad Fauzi",
+      "waktu": "2 jam lalu",
+      "prioritas": "mendesak",
+      "status": "proses",
+      "iconName": "wifi_off",
+      "catatan": "",
+      "pelangganId": "CUST-003"
+    },
+    {
+      "id": "TKT-003",
+      "judul": "Ping tinggi saat gaming",
+      "desc": "Latensi mencapai 200ms ke server SEA",
+      "pelanggan": "Bpk. Rudi",
+      "waktu": "5 jam lalu",
+      "prioritas": "tinggi",
+      "status": "proses",
+      "iconName": "network_check",
+      "catatan": ""
+    },
+    {
+      "id": "TKT-004",
+      "judul": "Permintaan upgrade paket",
+      "desc": "Ingin upgrade dari 20 Mbps ke 50 Mbps",
+      "pelanggan": "Ibu Dewi",
+      "waktu": "1 hari lalu",
+      "prioritas": "normal",
+      "status": "selesai",
+      "iconName": "upgrade",
+      "catatan": ""
+    }
+  ],
+  "akun": [
+    {
+      "id": "USR-001",
+      "email": "budi.santoso@netops.id",
+      "name": "Budi Santoso",
+      "role": "admin",
+      "title": "Administrator",
+      "passwordSalt": "dbd4cb5fbbb4c614ed66158ef18dfd84",
+      "passwordHash": "d7f6a09f7c01fdde01a2085ffcf03b8e65504f8e13ef9efd6220115eccb06b92bc6c17be3e2798ae31505bff9fd0cfde79260da678d1d3f981575bafc659e8f6",
+      "active": true
+    },
+    {
+      "id": "USR-002",
+      "email": "dani.pratama@netops.id",
+      "name": "Dani Pratama",
+      "role": "teknisi",
+      "title": "Teknisi Jaringan",
+      "passwordSalt": "7bd277f71a9357b80b4417c790759862",
+      "passwordHash": "cbfc06dd417a6636b8cb75fe7b79b66bfccf6234b3798f469bc3890f9c28f2d5bd36f6cf39348e8747d22116a72dcac2c7db824727d3ec90c0b0d01146677c5c",
+      "active": true
+    },
+    {
+      "id": "USR-003",
+      "email": "agus@example.com",
+      "name": "Bpk. Agus Setiawan",
+      "role": "pelanggan",
+      "title": "Pelanggan",
+      "customerId": "CUST-001",
+      "passwordSalt": "36a9e9787b78e25d9ce80d1308f436dd",
+      "passwordHash": "2fb19256332af8d104e9843e73585e5426246c72186d1a974046b0877ef382b945c939bec3e719e697aec94c026187b8c7bc3120e3940909ed554043b4d87420",
+      "active": true
+    },
+    {
+      "id": "USR-004",
+      "name": "Gilar S",
+      "email": "gilar@netops.com",
+      "role": "teknisi",
+      "title": "Teknisi Jaringan",
+      "active": true,
+      "passwordSalt": "b377ed4557fa92d4bdbfbd10fe3e3ec6",
+      "passwordHash": "96675d89ff307c3878487e878bff90eb6f31039993db8531ad7d7d9539ff08259497caf07715f2e0e3a13649c7db01971791a25eee8a2be0dc915e9a56203bb1"
+    }
+  ]
+}

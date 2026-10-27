@@ -13,11 +13,12 @@
         <AppButton variant="secondary" :full="true" class="sm:flex-none">
           <span class="material-symbols-outlined text-xl text-text-body">download</span><span>Unduh Data</span>
         </AppButton>
-        <AppButton @click="showModal = true" :full="true" class="sm:flex-none">
+        <AppButton v-if="auth.isAdmin" @click="showModal = true" :full="true" class="sm:flex-none">
           <span class="material-symbols-outlined text-xl">person_add</span><span>Tambah Pelanggan</span>
         </AppButton>
       </div>
     </div>
+    <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div v-for="s in stats" :key="s.label" class="p-5 rounded-xl bg-surface-base shadow-sm flex items-center justify-between">
         <div class="flex flex-col">
@@ -65,10 +66,10 @@
         <button @click="openDetail(row)" class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary transition-colors" title="Detail">
           <span class="material-symbols-outlined text-[18px]">visibility</span>
         </button>
-        <button @click="openEdit(row)" class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary transition-colors" title="Edit">
+        <button v-if="auth.isAdmin" @click="openEdit(row)" class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary transition-colors" title="Edit">
           <span class="material-symbols-outlined text-[18px]">edit</span>
         </button>
-        <button @click="openDelete(row)" class="p-1.5 rounded-lg hover:bg-status-danger-bg text-text-muted hover:text-status-danger-text transition-colors" title="Hapus">
+        <button v-if="auth.isAdmin" @click="openDelete(row)" class="p-1.5 rounded-lg hover:bg-status-danger-bg text-text-muted hover:text-status-danger-text transition-colors" title="Hapus">
           <span class="material-symbols-outlined text-[18px]">delete</span>
         </button>
       </template>
@@ -77,12 +78,10 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <AppInput v-model="form.name"    label="Nama Lengkap"      placeholder="Bpk./Ibu ..."  class="sm:col-span-2" />
         <AppInput v-model="form.phone"   label="No. Telepon"       placeholder="08xx..." />
+        <AppInput v-model="form.email"   label="Email Akun Portal"  placeholder="pelanggan@example.com" type="email" />
         <AppSelect v-model="form.paket"  label="Paket Internet">
           <option value="">Pilih paket...</option>
-          <option>Home Basic 20 Mbps</option>
-          <option>Fiber Pro 50 Mbps</option>
-          <option>Business 100 Mbps</option>
-          <option>Ultra 200 Mbps</option>
+          <option v-for="paket in paketOptions" :key="paket.id" :value="paket.name">{{ paket.name }}</option>
         </AppSelect>
         <AppInput v-model="form.address" label="Alamat Pemasangan" placeholder="Jl. ..."      class="sm:col-span-2" />
         <AppSelect v-model="form.status" label="Status" class="sm:col-span-2">
@@ -91,6 +90,7 @@
           <option value="isolir">Isolir</option>
         </AppSelect>
       </div>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3 pt-1">
         <AppButton variant="outline" :full="true" @click="closeModal">Batal</AppButton>
         <AppButton :full="true" @click="submitForm">{{ editTarget ? 'Simpan Perubahan' : 'Tambah Pelanggan' }}</AppButton>
@@ -115,7 +115,7 @@
       </div>
       <div class="flex gap-3 pt-1">
         <AppButton variant="outline" :full="true" @click="showDetailModal = false">Tutup</AppButton>
-        <AppButton :full="true" @click="openEdit(detailTarget); showDetailModal = false">Edit Data</AppButton>
+        <AppButton v-if="auth.isAdmin" :full="true" @click="openEdit(detailTarget); showDetailModal = false">Edit Data</AppButton>
       </div>
     </AppModal>
     <AppModal v-model="showDeleteModal" title="Hapus Pelanggan?" max-width="sm">
@@ -129,13 +129,16 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import AppButton    from '@/components/AppButton.vue'
 import AppInput     from '@/components/AppInput.vue'
 import AppSelect    from '@/components/AppSelect.vue'
 import AppModal     from '@/components/AppModal.vue'
 import AppDataTable from '@/components/AppDataTable.vue'
+import { api } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
+const auth = useAuthStore()
 const search          = ref('')
 const filterStatus    = ref('')
 const showModal       = ref(false)
@@ -144,7 +147,9 @@ const showDeleteModal = ref(false)
 const editTarget      = ref(null)
 const detailTarget    = ref(null)
 const deleteTarget    = ref(null)
-const form = reactive({ name:'', phone:'', paket:'', address:'', status:'aktif' })
+const errorMsg        = ref('')
+const paketOptions    = ref([])
+const form = reactive({ name:'', phone:'', email:'', paket:'', address:'', status:'aktif' })
 
 const columns = [
   { key:'id',      label:'ID',              thClass:'w-28' },
@@ -160,27 +165,34 @@ const sCls = {
   isolir:  'bg-status-danger-bg text-status-danger-text',
 }
 
-const stats = [
-  { label:'Total Pelanggan',  value:'128', sub:'+6 bulan ini',        subClass:'text-status-success-text', icon:'groups',        iconBg:'bg-surface-container',  iconColor:'text-primary-container' },
-  { label:'Layanan Aktif',    value:'122', sub:'95.3% operasional', subClass:'text-text-muted',           icon:'wifi_tethering',iconBg:'bg-status-success-bg',  iconColor:'text-status-success-text' },
-  { label:'Status Isolir',    value:'4',   sub:'Menunggak > 5 hr',   subClass:'text-status-warning-text',  icon:'phonelink_lock',iconBg:'bg-status-warning-bg',  iconColor:'text-status-warning-text' },
-  { label:'Nonaktif / Putus', value:'2',   sub:'Perlu tindak lanjut',subClass:'text-text-muted',           icon:'wifi_off',       iconBg:'bg-status-neutral-bg',  iconColor:'text-status-neutral-text' },
-]
+const rows = ref([])
+const stats = computed(() => {
+  const active = rows.value.filter(row => row.status === 'aktif').length
+  const isolated = rows.value.filter(row => row.status === 'isolir').length
+  const inactive = rows.value.filter(row => row.status === 'suspend').length
+  return [
+    { label:'Total Pelanggan', value:rows.value.length, sub:'Data tersimpan', subClass:'text-status-success-text', icon:'groups', iconBg:'bg-surface-container', iconColor:'text-primary-container' },
+    { label:'Layanan Aktif', value:active, sub:`${rows.value.length ? Math.round(active / rows.value.length * 100) : 0}% operasional`, subClass:'text-text-muted', icon:'wifi_tethering', iconBg:'bg-status-success-bg', iconColor:'text-status-success-text' },
+    { label:'Status Isolir', value:isolated, sub:'Perlu tindak lanjut', subClass:'text-status-warning-text', icon:'phonelink_lock', iconBg:'bg-status-warning-bg', iconColor:'text-status-warning-text' },
+    { label:'Suspend', value:inactive, sub:'Perlu tindak lanjut', subClass:'text-text-muted', icon:'wifi_off', iconBg:'bg-status-neutral-bg', iconColor:'text-status-neutral-text' },
+  ]
+})
 
-const rows = ref([
-  { id:'CUST-001', name:'Bpk. Agus Setiawan',   initials:'AS', address:'Jl. Melati No. 12',       paket:'Fiber Pro 50 Mbps',  status:'aktif',   tagihan:0,      phone:'+62 812-0001-0001' },
-  { id:'CUST-002', name:'Ibu Sari Dewi',         initials:'SD', address:'Griya Asri Blok C-07',    paket:'Home Basic 20 Mbps', status:'aktif',   tagihan:150000, phone:'+62 812-0002-0002' },
-  { id:'CUST-003', name:'Ahmad Fauzi',           initials:'AF', address:'Perum Anggrek Mas B-15',  paket:'Fiber Pro 50 Mbps',  status:'suspend', tagihan:300000, phone:'+62 812-0003-0003' },
-  { id:'CUST-004', name:'Bpk. Hendra Kurniawan', initials:'HK', address:'Jl. Kenanga Indah No. 8', paket:'Business 100 Mbps',  status:'aktif',   tagihan:0,      phone:'+62 812-0004-0004' },
-  { id:'CUST-005', name:'Ibu Ratna Sari',        initials:'RS', address:'Taman Bunga Blok A No.3', paket:'Home Basic 20 Mbps', status:'isolir',  tagihan:450000, phone:'+62 812-0005-0005' },
-  { id:'CUST-006', name:'Bpk. Doni Pratama',     initials:'DP', address:'Jl. Mawar No. 5',         paket:'Ultra 200 Mbps',     status:'aktif',   tagihan:0,      phone:'+62 812-0006-0006' },
-  { id:'CUST-007', name:'Ibu Lestari',           initials:'IL', address:'Perum Cendana No. 11',    paket:'Home Basic 20 Mbps', status:'aktif',   tagihan:75000,  phone:'+62 812-0007-0007' },
-  { id:'CUST-008', name:'Bpk. Wahyu Saputra',    initials:'WS', address:'Jl. Flamboyan No. 3',     paket:'Fiber Pro 50 Mbps',  status:'suspend', tagihan:500000, phone:'+62 812-0008-0008' },
-  { id:'CUST-009', name:'Ibu Mega Wulandari',    initials:'MW', address:'Griya Indah Blok D-02',   paket:'Business 100 Mbps',  status:'aktif',   tagihan:0,      phone:'+62 812-0009-0009' },
-  { id:'CUST-010', name:'Ahmad Rizky',           initials:'AR', address:'Jl. Anggrek No. 7',       paket:'Home Basic 20 Mbps', status:'isolir',  tagihan:300000, phone:'+62 812-0010-0010' },
-  { id:'CUST-011', name:'Bpk. Fajar Nugroho',    initials:'FN', address:'Perum Sejahtera A-5',     paket:'Fiber Pro 50 Mbps',  status:'aktif',   tagihan:0,      phone:'+62 812-0011-0011' },
-  { id:'CUST-012', name:'Ibu Yanti Kusuma',      initials:'YK', address:'Jl. Dahlia No. 9',        paket:'Ultra 200 Mbps',     status:'aktif',   tagihan:0,      phone:'+62 812-0012-0012' },
-])
+onMounted(() => Promise.all([loadRows(), ...(auth.isAdmin ? [loadPakets()] : [])]))
+async function loadRows() {
+  try {
+    rows.value = await api.list('pelanggan')
+  } catch (error) {
+    errorMsg.value = `Gagal memuat pelanggan: ${error.message}`
+  }
+}
+async function loadPakets() {
+  try {
+    paketOptions.value = await api.list('paket')
+  } catch (error) {
+    errorMsg.value = `Gagal memuat pilihan paket: ${error.message}`
+  }
+}
 
 const filteredRows = computed(() => {
   if (!filterStatus.value) return rows.value
@@ -190,6 +202,7 @@ const filteredRows = computed(() => {
 const detailFields = computed(() => detailTarget.value ? [
   { label:'ID Pelanggan', value: detailTarget.value.id },
   { label:'No. Telepon',  value: detailTarget.value.phone },
+  { label:'Email Akun',   value: detailTarget.value.email || '-' },
   { label:'Paket',        value: detailTarget.value.paket },
   { label:'Alamat',       value: detailTarget.value.address },
 ] : [])
@@ -197,22 +210,48 @@ const detailFields = computed(() => detailTarget.value ? [
 function openDetail(row) { detailTarget.value = row; showDetailModal.value = true }
 function openEdit(row) {
   editTarget.value = row
-  Object.assign(form, { name: row.name, phone: row.phone, paket: row.paket, address: row.address, status: row.status })
+  Object.assign(form, { name: row.name, phone: row.phone, email: row.email || '', paket: row.paket, address: row.address, status: row.status })
   showModal.value = true
 }
 function openDelete(row) { deleteTarget.value = row; showDeleteModal.value = true }
-function closeModal() { showModal.value = false; editTarget.value = null; Object.assign(form, { name:'', phone:'', paket:'', address:'', status:'aktif' }) }
-function submitForm() {
-  if (editTarget.value) {
-    Object.assign(editTarget.value, { name: form.name, phone: form.phone, paket: form.paket, address: form.address, status: form.status })
-  } else {
-    const initials = form.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase()
-    rows.value.push({ id:'CUST-' + String(rows.value.length + 1).padStart(3,'0'), name: form.name, initials, phone: form.phone, paket: form.paket, address: form.address, status: form.status, tagihan: 0 })
+function closeModal() { showModal.value = false; editTarget.value = null; Object.assign(form, { name:'', phone:'', email:'', paket:'', address:'', status:'aktif' }) }
+async function submitForm() {
+  if (!form.name.trim() || !form.phone.trim() || !form.paket || !form.address.trim()) {
+    errorMsg.value = 'Nama, telepon, paket, dan alamat wajib diisi.'
+    return
   }
-  closeModal()
+  const customer = {
+    name: form.name.trim(),
+    initials: form.name.trim().split(/\s+/).map(word => word[0]).slice(0, 2).join('').toUpperCase(),
+    phone: form.phone.trim(),
+    email: form.email.trim().toLowerCase(),
+    paket: form.paket,
+    address: form.address.trim(),
+    status: form.status,
+    tagihan: editTarget.value?.tagihan ?? 0,
+  }
+  try {
+    errorMsg.value = ''
+    if (editTarget.value) {
+      const updated = await api.update('pelanggan', editTarget.value.id, customer)
+      Object.assign(editTarget.value, updated)
+    } else {
+      rows.value.push(await api.create('pelanggan', customer))
+    }
+    closeModal()
+  } catch (error) {
+    errorMsg.value = `Gagal menyimpan pelanggan: ${error.message}`
+  }
 }
-function confirmDelete() {
-  rows.value = rows.value.filter(p => p.id !== deleteTarget.value.id)
-  showDeleteModal.value = false; deleteTarget.value = null
+async function confirmDelete() {
+  try {
+    errorMsg.value = ''
+    await api.remove('pelanggan', deleteTarget.value.id)
+    rows.value = rows.value.filter(p => p.id !== deleteTarget.value.id)
+    showDeleteModal.value = false
+    deleteTarget.value = null
+  } catch (error) {
+    errorMsg.value = `Gagal menghapus pelanggan: ${error.message}`
+  }
 }
 </script>

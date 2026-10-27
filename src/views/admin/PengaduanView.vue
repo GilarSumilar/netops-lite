@@ -18,8 +18,12 @@
           <option value="proses">Dalam Proses</option>
           <option value="selesai">Selesai</option>
         </AppSelect>
+        <AppButton v-if="auth.isAdmin" @click="showCreateModal = true" :full="true" class="sm:w-auto">
+          <span class="material-symbols-outlined text-lg">add</span><span>Buat Tiket</span>
+        </AppButton>
       </div>
     </div>
+    <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
     <div class="flex flex-col gap-3">
       <div
         v-for="t in filtered"
@@ -85,6 +89,10 @@
             >
             Tangani
           </AppButton>
+          <AppButton v-if="auth.isAdmin" variant="danger" size="sm" @click="openDelete(t)">
+            <span class="material-symbols-outlined text-[16px]">delete</span>
+            Hapus
+          </AppButton>
         </div>
       </div>
     </div>
@@ -120,6 +128,7 @@
           class="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container resize-none"
         ></textarea>
       </div>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3">
         <AppButton
           variant="outline"
@@ -130,18 +139,55 @@
         <AppButton :full="true" @click="submitTangani">Simpan Update</AppButton>
       </div>
     </AppModal>
+    <AppModal v-model="showCreateModal" title="Buat Tiket Pengaduan">
+      <div class="flex flex-col gap-3">
+        <AppInput v-model="createForm.judul" label="Judul" placeholder="Contoh: Koneksi lambat" />
+        <AppInput v-model="createForm.pelanggan" label="Nama Pelanggan" placeholder="Nama pelanggan" />
+        <AppSelect v-model="createForm.prioritas" label="Prioritas">
+          <option value="normal">Normal</option>
+          <option value="tinggi">Tinggi</option>
+          <option value="mendesak">Mendesak</option>
+        </AppSelect>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label-md text-label-md text-text-primary">Deskripsi</label>
+          <textarea v-model="createForm.desc" rows="3" placeholder="Jelaskan masalah..." class="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-base font-body-md text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container resize-none"></textarea>
+        </div>
+      </div>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
+      <div class="flex gap-3">
+        <AppButton variant="outline" :full="true" @click="showCreateModal = false">Batal</AppButton>
+        <AppButton :full="true" @click="submitCreate">Buat Tiket</AppButton>
+      </div>
+    </AppModal>
+    <AppModal v-model="showDeleteModal" title="Hapus Tiket?" max-width="sm">
+      <p class="font-body-md text-body-md text-text-body">Tiket <strong>{{ deleteTarget?.id }}</strong> akan dihapus permanen.</p>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
+      <div class="flex gap-3">
+        <AppButton variant="outline" :full="true" @click="showDeleteModal = false">Batal</AppButton>
+        <AppButton variant="danger" :full="true" @click="confirmDelete">Hapus</AppButton>
+      </div>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import AppButton from "@/components/AppButton.vue";
+import AppInput from "@/components/AppInput.vue";
 import AppSelect from "@/components/AppSelect.vue";
 import AppModal from "@/components/AppModal.vue";
+import { api } from "@/services/api";
+import { useAuthStore } from "@/stores/auth";
+const auth = useAuthStore();
 const filterStatus = ref("");
 const showTanganiModal = ref(false);
+const showCreateModal = ref(false);
+const showDeleteModal = ref(false);
 const activeTiket = ref(null);
+const deleteTarget = ref(null);
+const errorMsg = ref("");
 const tanganiForm = reactive({ status: "proses", catatan: "" });
+const createForm = reactive({ judul: "", pelanggan: "", prioritas: "normal", desc: "" });
 const prioCls = {
   mendesak: {
     bg: "bg-status-danger-bg",
@@ -164,48 +210,15 @@ const sCls = {
   proses: "bg-status-warning-bg text-status-warning-text",
   selesai: "bg-status-success-bg text-status-success-text",
 };
-const tikets = ref([
-  {
-    id: "TKT-001",
-    judul: "Koneksi lambat sejak kemarin malam",
-    desc: "Kecepatan download hanya 2 Mbps dari paket 50 Mbps",
-    pelanggan: "Ibu Sari Dewi",
-    waktu: "23 mnt lalu",
-    prioritas: "mendesak",
-    status: "baru",
-    iconName: "speed",
-  },
-  {
-    id: "TKT-002",
-    judul: "Internet mati total sejak pagi",
-    desc: "Router menyala tapi tidak ada koneksi ke luar",
-    pelanggan: "Ahmad Fauzi",
-    waktu: "2 jam lalu",
-    prioritas: "mendesak",
-    status: "proses",
-    iconName: "wifi_off",
-  },
-  {
-    id: "TKT-003",
-    judul: "Ping tinggi saat gaming",
-    desc: "Latensi mencapai 200ms ke server SEA",
-    pelanggan: "Bpk. Rudi",
-    waktu: "5 jam lalu",
-    prioritas: "tinggi",
-    status: "proses",
-    iconName: "network_check",
-  },
-  {
-    id: "TKT-004",
-    judul: "Permintaan upgrade paket",
-    desc: "Ingin upgrade dari 20 Mbps ke 50 Mbps",
-    pelanggan: "Ibu Dewi",
-    waktu: "1 hari lalu",
-    prioritas: "normal",
-    status: "selesai",
-    iconName: "upgrade",
-  },
-]);
+const tikets = ref([]);
+onMounted(loadTikets);
+async function loadTikets() {
+  try {
+    tikets.value = await api.list("pengaduan");
+  } catch (error) {
+    errorMsg.value = `Gagal memuat tiket: ${error.message}`;
+  }
+}
 const filtered = computed(() =>
   tikets.value.filter(
     (t) => !filterStatus.value || t.status === filterStatus.value,
@@ -217,9 +230,55 @@ function openTangani(t) {
   tanganiForm.catatan = "";
   showTanganiModal.value = true;
 }
-function submitTangani() {
-  // ponytail: mock — swap real API
-  if (activeTiket.value) activeTiket.value.status = tanganiForm.status;
-  showTanganiModal.value = false;
+async function submitTangani() {
+  if (!activeTiket.value) return;
+  try {
+    errorMsg.value = "";
+    Object.assign(activeTiket.value, await api.update("pengaduan", activeTiket.value.id, {
+      status: tanganiForm.status,
+      catatan: tanganiForm.catatan,
+    }));
+    showTanganiModal.value = false;
+  } catch (error) {
+    errorMsg.value = `Gagal memperbarui tiket: ${error.message}`;
+  }
+}
+async function submitCreate() {
+  if (!createForm.judul.trim() || !createForm.pelanggan.trim() || !createForm.desc.trim()) {
+    errorMsg.value = "Judul, nama pelanggan, dan deskripsi wajib diisi.";
+    return;
+  }
+  try {
+    errorMsg.value = "";
+    tikets.value.unshift(await api.create("pengaduan", {
+      ...createForm,
+      judul: createForm.judul.trim(),
+      pelanggan: createForm.pelanggan.trim(),
+      desc: createForm.desc.trim(),
+      waktu: "Baru saja",
+      status: "baru",
+      iconName: "support_agent",
+      catatan: "",
+    }));
+    Object.assign(createForm, { judul: "", pelanggan: "", prioritas: "normal", desc: "" });
+    showCreateModal.value = false;
+  } catch (error) {
+    errorMsg.value = `Gagal membuat tiket: ${error.message}`;
+  }
+}
+function openDelete(ticket) {
+  deleteTarget.value = ticket;
+  showDeleteModal.value = true;
+}
+async function confirmDelete() {
+  try {
+    errorMsg.value = "";
+    await api.remove("pengaduan", deleteTarget.value.id);
+    tikets.value = tikets.value.filter(ticket => ticket.id !== deleteTarget.value.id);
+    showDeleteModal.value = false;
+    deleteTarget.value = null;
+  } catch (error) {
+    errorMsg.value = `Gagal menghapus tiket: ${error.message}`;
+  }
 }
 </script>

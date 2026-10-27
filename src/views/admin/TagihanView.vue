@@ -9,6 +9,7 @@
         <span class="material-symbols-outlined text-lg">add</span><span>Catat Pembayaran</span>
       </AppButton>
     </div>
+    <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
       <div v-for="s in summary" :key="s.label" :class="['rounded-xl p-4 border flex flex-col gap-1', s.bg]">
         <span class="font-label-md text-label-md" :class="s.textMuted">{{ s.label }}</span>
@@ -54,13 +55,20 @@
           class="p-1.5 rounded-lg hover:bg-status-success-bg text-text-muted hover:text-status-success-text transition-colors" title="Tandai Lunas">
           <span class="material-symbols-outlined text-[18px]">check_circle</span>
         </button>
+        <button @click="openEdit(row)" class="p-1.5 rounded-lg hover:bg-surface-container text-text-muted hover:text-text-primary transition-colors" title="Edit">
+          <span class="material-symbols-outlined text-[18px]">edit</span>
+        </button>
+        <button @click="openDelete(row)" class="p-1.5 rounded-lg hover:bg-status-danger-bg text-text-muted hover:text-status-danger-text transition-colors" title="Hapus">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
       </template>
     </AppDataTable>
     <!-- Modal Catat Pembayaran -->
-    <AppModal v-model="showCatatModal" title="Catat Pembayaran">
+    <AppModal v-model="showCatatModal" :title="editTarget ? 'Edit Tagihan' : 'Catat Tagihan / Pembayaran'">
       <div class="flex flex-col gap-3">
         <AppInput v-model="catatForm.pelanggan" label="ID / Nama Pelanggan" placeholder="CUST-001 atau nama..." />
-        <AppInput v-model="catatForm.jumlah"    label="Jumlah Pembayaran"   placeholder="Rp 0" />
+        <AppInput v-model="catatForm.periode"   label="Periode Tagihan"     placeholder="Oktober 2024" />
+        <AppInput v-model="catatForm.jumlah"    label="Nominal (angka)"     placeholder="250000" />
         <AppSelect v-model="catatForm.metode"   label="Metode Pembayaran">
           <option value="">Pilih metode...</option>
           <option>Transfer Bank</option>
@@ -69,9 +77,10 @@
           <option>Virtual Account</option>
         </AppSelect>
       </div>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3 pt-1">
-        <AppButton variant="outline" :full="true" @click="showCatatModal = false">Batal</AppButton>
-        <AppButton :full="true" @click="submitCatat">Simpan</AppButton>
+        <AppButton variant="outline" :full="true" @click="closeCatatModal">Batal</AppButton>
+        <AppButton :full="true" @click="submitCatat">{{ editTarget ? 'Simpan Perubahan' : 'Simpan' }}</AppButton>
       </div>
     </AppModal>
     <!-- Modal Detail Tagihan -->
@@ -119,31 +128,45 @@
         <option>QRIS</option>
         <option>Virtual Account</option>
       </AppSelect>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3">
         <AppButton variant="outline" :full="true" @click="showTandaiModal = false">Batal</AppButton>
         <AppButton :full="true" @click="confirmTandai"><span class="material-symbols-outlined text-lg">check_circle</span> Konfirmasi Lunas</AppButton>
+      </div>
+    </AppModal>
+    <AppModal v-model="showDeleteModal" title="Hapus Tagihan?" max-width="sm">
+      <p class="font-body-md text-body-md text-text-body">Tagihan <strong>{{ deleteTarget?.id }}</strong> akan dihapus permanen.</p>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
+      <div class="flex gap-3">
+        <AppButton variant="outline" :full="true" @click="showDeleteModal = false">Batal</AppButton>
+        <AppButton variant="danger" :full="true" @click="confirmDelete">Hapus</AppButton>
       </div>
     </AppModal>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import AppButton    from '@/components/AppButton.vue'
 import AppInput     from '@/components/AppInput.vue'
 import AppSelect    from '@/components/AppSelect.vue'
 import AppModal     from '@/components/AppModal.vue'
 import AppDataTable from '@/components/AppDataTable.vue'
+import { api } from '@/services/api'
 
 const search          = ref('')
 const filterStatus    = ref('')
 const showCatatModal  = ref(false)
 const showDetailModal = ref(false)
 const showTandaiModal = ref(false)
+const showDeleteModal = ref(false)
 const detailTarget    = ref(null)
 const tandaiTarget    = ref(null)
+const editTarget      = ref(null)
+const deleteTarget    = ref(null)
 const tandaiMetode    = ref('')
-const catatForm = reactive({ pelanggan:'', jumlah:'', metode:'' })
+const errorMsg        = ref('')
+const catatForm = reactive({ pelanggan:'', periode:'', jumlah:'', metode:'' })
 
 const columns = [
   { key:'id',      label:'ID Tagihan',  thClass:'w-36' },
@@ -160,26 +183,29 @@ const sCls = {
 }
 const statusLabel = { lunas:'Lunas', belum:'Belum Bayar', terlambat:'Terlambat' }
 
-const summary = [
-  { label:'Total Tagihan Bulan Ini', value:'Rp 192.5 Juta', sub:'1.284 tagihan diterbitkan', bg:'bg-surface-container-low border-border-subtle',          textMain:'text-text-primary',       textMuted:'text-text-muted' },
-  { label:'Sudah Lunas',            value:'Rp 149.4 Juta', sub:'997 tagihan (77.6%)',         bg:'bg-status-success-bg border-status-success-text/20',  textMain:'text-status-success-text', textMuted:'text-status-success-text/70' },
-  { label:'Belum Dibayar',          value:'Rp 43.1 Juta',  sub:'287 tagihan tertunggak',        bg:'bg-status-danger-bg border-status-danger-text/20',    textMain:'text-status-danger-text',  textMuted:'text-status-danger-text/70' },
-]
-
-const tagihans = ref([
-  { id:'INV-2024-1001', nama:'Bpk. Agus Setiawan',    periode:'Oktober 2024',   nominal:'Rp 250.000', status:'lunas',     metode:'Transfer Bank',  tglBayar:'2 Okt 2024' },
-  { id:'INV-2024-1002', nama:'Ibu Sari Dewi',          periode:'Oktober 2024',   nominal:'Rp 150.000', status:'belum',     metode:'-',              tglBayar:'' },
-  { id:'INV-2024-1003', nama:'Ahmad Fauzi',            periode:'September 2024', nominal:'Rp 250.000', status:'terlambat', metode:'-',              tglBayar:'' },
-  { id:'INV-2024-1004', nama:'Bpk. Hendra Kurniawan', periode:'Oktober 2024',   nominal:'Rp 450.000', status:'lunas',     metode:'QRIS',           tglBayar:'5 Okt 2024' },
-  { id:'INV-2024-1005', nama:'Ibu Ratna Sari',         periode:'Agustus 2024',   nominal:'Rp 150.000', status:'terlambat', metode:'-',              tglBayar:'' },
-  { id:'INV-2024-1006', nama:'Bpk. Doni Pratama',     periode:'Oktober 2024',   nominal:'Rp 750.000', status:'lunas',     metode:'Transfer Bank',  tglBayar:'1 Okt 2024' },
-  { id:'INV-2024-1007', nama:'Ibu Lestari',            periode:'Oktober 2024',   nominal:'Rp 150.000', status:'belum',     metode:'-',              tglBayar:'' },
-  { id:'INV-2024-1008', nama:'Bpk. Wahyu Saputra',    periode:'Oktober 2024',   nominal:'Rp 250.000', status:'terlambat', metode:'-',              tglBayar:'' },
-  { id:'INV-2024-1009', nama:'Ibu Mega Wulandari',    periode:'Oktober 2024',   nominal:'Rp 450.000', status:'lunas',     metode:'Virtual Account', tglBayar:'3 Okt 2024' },
-  { id:'INV-2024-1010', nama:'Ahmad Rizky',            periode:'September 2024', nominal:'Rp 150.000', status:'terlambat', metode:'-',              tglBayar:'' },
-  { id:'INV-2024-1011', nama:'Bpk. Fajar Nugroho',    periode:'Oktober 2024',   nominal:'Rp 250.000', status:'lunas',     metode:'Tunai',          tglBayar:'4 Okt 2024' },
-  { id:'INV-2024-1012', nama:'Ibu Yanti Kusuma',      periode:'Oktober 2024',   nominal:'Rp 750.000', status:'belum',     metode:'-',              tglBayar:'' },
-])
+const tagihans = ref([])
+const summary = computed(() => {
+  const total = tagihans.value.reduce((sum, row) => sum + amount(row.nominal), 0)
+  const paid = tagihans.value.filter(row => row.status === 'lunas').reduce((sum, row) => sum + amount(row.nominal), 0)
+  const outstanding = total - paid
+  const format = value => `Rp ${value.toLocaleString('id-ID')}`
+  return [
+    { label:'Total Tagihan', value:format(total), sub:`${tagihans.value.length} tagihan diterbitkan`, bg:'bg-surface-container-low border-border-subtle', textMain:'text-text-primary', textMuted:'text-text-muted' },
+    { label:'Sudah Lunas', value:format(paid), sub:`${tagihans.value.filter(row => row.status === 'lunas').length} tagihan`, bg:'bg-status-success-bg border-status-success-text/20', textMain:'text-status-success-text', textMuted:'text-status-success-text/70' },
+    { label:'Belum Dibayar', value:format(outstanding), sub:`${tagihans.value.filter(row => row.status !== 'lunas').length} tagihan tertunggak`, bg:'bg-status-danger-bg border-status-danger-text/20', textMain:'text-status-danger-text', textMuted:'text-status-danger-text/70' },
+  ]
+})
+onMounted(loadTagihans)
+async function loadTagihans() {
+  try {
+    tagihans.value = await api.list('tagihan')
+  } catch (error) {
+    errorMsg.value = `Gagal memuat tagihan: ${error.message}`
+  }
+}
+function amount(value) {
+  return Number(String(value).replace(/\D/g, '')) || 0
+}
 
 const filteredRows = computed(() => {
   if (filterStatus.value) return tagihans.value.filter(t => t.status === filterStatus.value)
@@ -188,17 +214,69 @@ const filteredRows = computed(() => {
 
 function openDetail(row)  { detailTarget.value = row; showDetailModal.value = true }
 function openTandai(row)  { tandaiTarget.value = row; tandaiMetode.value = ''; showTandaiModal.value = true }
-function confirmTandai() {
-  if (tandaiTarget.value) {
-    tandaiTarget.value.status   = 'lunas'
-    tandaiTarget.value.metode   = tandaiMetode.value || 'Tunai'
-    tandaiTarget.value.tglBayar = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' })
+async function confirmTandai() {
+  if (!tandaiTarget.value) return
+  try {
+    errorMsg.value = ''
+    Object.assign(tandaiTarget.value, await api.update('tagihan', tandaiTarget.value.id, {
+      status: 'lunas',
+      metode: tandaiMetode.value || 'Tunai',
+      tglBayar: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }),
+    }))
+    showTandaiModal.value = false
+  } catch (error) {
+    errorMsg.value = `Gagal memperbarui pembayaran: ${error.message}`
   }
-  showTandaiModal.value = false
 }
-function submitCatat() {
-  // ponytail: mock — swap real API
+function openEdit(row) {
+  editTarget.value = row
+  Object.assign(catatForm, { pelanggan:row.nama, periode:row.periode, jumlah:String(amount(row.nominal)), metode:row.metode === '-' ? '' : row.metode })
+  showCatatModal.value = true
+}
+function closeCatatModal() {
   showCatatModal.value = false
-  catatForm.pelanggan = ''; catatForm.jumlah = ''; catatForm.metode = ''
+  editTarget.value = null
+  Object.assign(catatForm, { pelanggan:'', periode:'', jumlah:'', metode:'' })
+}
+async function submitCatat() {
+  const nominal = amount(catatForm.jumlah)
+  if (!catatForm.pelanggan.trim() || !catatForm.periode.trim() || nominal <= 0) {
+    errorMsg.value = 'Pelanggan, periode, dan nominal lebih dari 0 wajib diisi.'
+    return
+  }
+  const record = {
+    nama: catatForm.pelanggan.trim(),
+    periode: catatForm.periode.trim(),
+    nominal: `Rp ${nominal.toLocaleString('id-ID')}`,
+    status: editTarget.value?.status || 'belum',
+    metode: catatForm.metode || editTarget.value?.metode || '-',
+    tglBayar: editTarget.value?.tglBayar || '',
+  }
+  try {
+    errorMsg.value = ''
+    if (editTarget.value) {
+      Object.assign(editTarget.value, await api.update('tagihan', editTarget.value.id, record))
+    } else {
+      tagihans.value.push(await api.create('tagihan', record))
+    }
+    closeCatatModal()
+  } catch (error) {
+    errorMsg.value = `Gagal menyimpan tagihan: ${error.message}`
+  }
+}
+function openDelete(row) {
+  deleteTarget.value = row
+  showDeleteModal.value = true
+}
+async function confirmDelete() {
+  try {
+    errorMsg.value = ''
+    await api.remove('tagihan', deleteTarget.value.id)
+    tagihans.value = tagihans.value.filter(row => row.id !== deleteTarget.value.id)
+    showDeleteModal.value = false
+    deleteTarget.value = null
+  } catch (error) {
+    errorMsg.value = `Gagal menghapus tagihan: ${error.message}`
+  }
 }
 </script>

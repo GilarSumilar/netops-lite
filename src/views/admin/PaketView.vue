@@ -6,6 +6,7 @@
         <span class="material-symbols-outlined text-lg">add</span><span>Tambah Paket</span>
       </AppButton>
     </div>
+    <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       <div v-for="p in pakets" :key="p.id" class="bg-surface-base rounded-xl border border-border-subtle p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex items-start justify-between"><div><h3 class="font-headline-sm text-headline-sm text-text-primary">{{ p.name }}</h3><p class="font-body-sm text-body-sm text-text-muted mt-0.5">{{ p.desc }}</p></div>
@@ -24,7 +25,12 @@
         <AppInput v-model="paketForm.desc" label="Deskripsi" placeholder="Cocok untuk..." />
         <AppInput v-model="paketForm.speed" label="Kecepatan" placeholder="50 Mbps" />
         <AppInput v-model="paketForm.price" label="Harga/Bulan" placeholder="Rp 250.000" />
+        <label class="flex items-center gap-2 font-body-md text-text-primary">
+          <input v-model="paketForm.active" type="checkbox" class="accent-primary-container" />
+          Paket aktif
+        </label>
       </div>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3">
         <AppButton variant="outline" :full="true" @click="closePaketModal">Batal</AppButton>
         <AppButton :full="true" @click="submitPaket">Simpan</AppButton>
@@ -32,6 +38,7 @@
     </AppModal>
     <AppModal v-model="showDeleteModal" title="Hapus Paket?" max-width="sm">
       <p class="font-body-md text-body-md text-text-body">Paket <strong>{{ deleteTarget?.name }}</strong> akan dihapus permanen.</p>
+      <p v-if="errorMsg" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg }}</p>
       <div class="flex gap-3">
         <AppButton variant="outline" :full="true" @click="showDeleteModal = false">Batal</AppButton>
         <AppButton variant="danger" :full="true" @click="confirmDelete">Hapus</AppButton>
@@ -41,30 +48,57 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import AppButton from '@/components/AppButton.vue'
 import AppInput  from '@/components/AppInput.vue'
 import AppModal  from '@/components/AppModal.vue'
+import { api } from '@/services/api'
 
 const showTambahModal = ref(false)
 const showDeleteModal = ref(false)
 const editTarget = ref(null)
 const deleteTarget = ref(null)
-const paketForm = reactive({ name:'', desc:'', speed:'', price:'' })
-const pakets = ref([
-  { id:1, name:'Home Basic 20 Mbps', desc:'Cocok untuk browsing dan streaming SD',     speed:'20 Mbps',  price:'Rp 150.000/bln', subscribers:423, active:true },
-  { id:2, name:'Fiber Pro 50 Mbps',  desc:'Ideal untuk keluarga aktif streaming HD',   speed:'50 Mbps',  price:'Rp 250.000/bln', subscribers:612, active:true },
-  { id:3, name:'Business 100 Mbps',  desc:'Koneksi stabil untuk warnet dan UMKM',      speed:'100 Mbps', price:'Rp 450.000/bln', subscribers:187, active:true },
-  { id:4, name:'Ultra 200 Mbps',     desc:'Performa tertinggi untuk gaming streaming', speed:'200 Mbps', price:'Rp 750.000/bln', subscribers:62,  active:true },
-  { id:5, name:'Starter 10 Mbps',    desc:'Paket hemat untuk penggunaan ringan',       speed:'10 Mbps',  price:'Rp 99.000/bln',  subscribers:0,   active:false },
-])
-function openEdit(p) { editTarget.value = p; paketForm.name=p.name; paketForm.desc=p.desc; paketForm.speed=p.speed; paketForm.price=p.price; showTambahModal.value=true }
-function closePaketModal() { showTambahModal.value=false; editTarget.value=null; paketForm.name=''; paketForm.desc=''; paketForm.speed=''; paketForm.price='' }
-function submitPaket() {
-  if (editTarget.value) { Object.assign(editTarget.value, { name:paketForm.name, desc:paketForm.desc, speed:paketForm.speed, price:paketForm.price }) }
-  else { pakets.value.push({ id:Date.now(), name:paketForm.name, desc:paketForm.desc, speed:paketForm.speed, price:paketForm.price, subscribers:0, active:true }) }
-  closePaketModal()
+const errorMsg = ref('')
+const paketForm = reactive({ name:'', desc:'', speed:'', price:'', active:true })
+const pakets = ref([])
+onMounted(loadPakets)
+async function loadPakets() {
+  try {
+    pakets.value = await api.list('paket')
+  } catch (error) {
+    errorMsg.value = `Gagal memuat paket: ${error.message}`
+  }
+}
+function openEdit(p) { editTarget.value = p; paketForm.name=p.name; paketForm.desc=p.desc; paketForm.speed=p.speed; paketForm.price=p.price; paketForm.active=p.active; showTambahModal.value=true }
+function closePaketModal() { showTambahModal.value=false; editTarget.value=null; Object.assign(paketForm, { name:'', desc:'', speed:'', price:'', active:true }) }
+async function submitPaket() {
+  if (!paketForm.name.trim() || !paketForm.desc.trim() || !paketForm.speed.trim() || !paketForm.price.trim()) {
+    errorMsg.value = 'Nama, deskripsi, kecepatan, dan harga wajib diisi.'
+    return
+  }
+  const paket = { name:paketForm.name.trim(), desc:paketForm.desc.trim(), speed:paketForm.speed.trim(), price:paketForm.price.trim(), active:paketForm.active }
+  try {
+    errorMsg.value = ''
+    if (editTarget.value) {
+      Object.assign(editTarget.value, await api.update('paket', editTarget.value.id, paket))
+    } else {
+      pakets.value.push(await api.create('paket', { ...paket, subscribers:0 }))
+    }
+    closePaketModal()
+  } catch (error) {
+    errorMsg.value = `Gagal menyimpan paket: ${error.message}`
+  }
 }
 function deletePaket(id) { deleteTarget.value = pakets.value.find(p => p.id === id); showDeleteModal.value = true }
-function confirmDelete() { pakets.value = pakets.value.filter(p => p.id !== deleteTarget.value.id); showDeleteModal.value = false; deleteTarget.value = null }
+async function confirmDelete() {
+  try {
+    errorMsg.value = ''
+    await api.remove('paket', deleteTarget.value.id)
+    pakets.value = pakets.value.filter(p => p.id !== deleteTarget.value.id)
+    showDeleteModal.value = false
+    deleteTarget.value = null
+  } catch (error) {
+    errorMsg.value = `Gagal menghapus paket: ${error.message}`
+  }
+}
 </script>

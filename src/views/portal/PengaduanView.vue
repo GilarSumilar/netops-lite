@@ -44,6 +44,7 @@
         >
           Tiket berhasil dikirim! Tim kami akan menghubungi Anda.
         </p>
+        <p v-if="errorMsg || portal.error" role="alert" class="rounded-lg bg-status-danger-bg px-3 py-2 font-body-sm text-status-danger-text">{{ errorMsg || portal.error }}</p>
         <AppButton type="submit" :full="true" size="lg">
           <span class="material-symbols-outlined text-[18px]">send</span> Kirim
           Laporan
@@ -59,7 +60,7 @@
       </h3>
       <div class="flex flex-col divide-y divide-border-subtle">
         <div
-          v-for="t in tikets"
+          v-for="t in portal.data?.pengaduan || []"
           :key="t.id"
           class="py-3 flex items-start justify-between gap-3"
         >
@@ -68,7 +69,7 @@
               {{ t.judul }}
             </p>
             <p class="font-body-sm text-body-sm text-text-muted">
-              {{ t.id }} • {{ t.tanggal }}
+              {{ t.id }} • {{ t.waktu }}
             </p>
           </div>
           <span
@@ -76,7 +77,7 @@
               'px-2 py-0.5 rounded-full font-label-sm whitespace-nowrap',
               sCls[t.status],
             ]"
-            >{{ t.status }}</span
+            >{{ statusLabel[t.status] || t.status }}</span
           >
         </div>
       </div>
@@ -85,43 +86,35 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import AppButton from "@/components/AppButton.vue";
 import AppSelect from "@/components/AppSelect.vue";
+import { usePortalStore } from "@/stores/portal";
 const form = reactive({ kategori: "", deskripsi: "" });
 const submitted = ref(false);
+const errorMsg = ref("");
+const portal = usePortalStore();
+const statusLabel = { baru: "Baru", proses: "Dalam Proses", selesai: "Selesai" };
 const sCls = {
-  Baru: "bg-primary-fixed text-primary",
-  "Dalam Proses": "bg-status-warning-bg text-status-warning-text",
-  Selesai: "bg-status-success-bg text-status-success-text",
+  baru: "bg-primary-fixed text-primary",
+  proses: "bg-status-warning-bg text-status-warning-text",
+  selesai: "bg-status-success-bg text-status-success-text",
 };
-const tikets = [
-  {
-    id: "TKT-089",
-    judul: "Koneksi lambat sore hari",
-    tanggal: "28 Sep 2024",
-    status: "Selesai",
-  },
-  {
-    id: "TKT-076",
-    judul: "Internet mati 2 jam",
-    tanggal: "15 Agt 2024",
-    status: "Selesai",
-  },
-  {
-    id: "TKT-064",
-    judul: "Permintaan relokasi router",
-    tanggal: "2 Jul 2024",
-    status: "Selesai",
-  },
-];
-function submitTiket() {
-  if (!form.kategori || !form.deskripsi) return;
-  submitted.value = true;
-  form.kategori = "";
-  form.deskripsi = "";
-  setTimeout(() => {
-    submitted.value = false;
-  }, 4000);
+onMounted(() => portal.load());
+async function submitTiket() {
+  if (!form.kategori || !form.deskripsi.trim()) return;
+  try {
+    errorMsg.value = "";
+    await portal.createTicket({
+      judul: form.kategori,
+      desc: form.deskripsi.trim(),
+    });
+    submitted.value = true;
+    form.kategori = "";
+    form.deskripsi = "";
+    setTimeout(() => { submitted.value = false; }, 4000);
+  } catch (error) {
+    errorMsg.value = `Gagal mengirim pengaduan: ${error.message}`;
+  }
 }
 </script>
